@@ -709,6 +709,87 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 .player-result22 .box span{color:var(--muted);font-size:.75rem}
 .player-result22 .box strong{color:var(--gold2);font-size:1.35rem}
 @media(max-width:560px){.weapon-grid22,.player-result22 .numbers{grid-template-columns:1fr}}
+
+/* =========================================================
+   FORJA 2.2.2 · CONJUROS GUIADOS Y FIN DE COMBATE
+   ========================================================= */
+.spell-card222{
+  background:#17120d;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:13px;
+  margin:10px 0;
+}
+.spell-facts222{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin:10px 0;
+}
+.spell-facts222 span{
+  background:#120f0b;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px;
+  font-size:.82rem;
+}
+.spell-result222,.combat-end222{
+  text-align:center;
+  display:grid;
+  gap:12px;
+}
+.spell-result222 .icon,.combat-end222 .icon{
+  font-size:3.3rem;
+  line-height:1;
+}
+.spell-result222 .result-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.spell-result222 .result-box{
+  background:#17120d;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:11px;
+}
+.spell-result222 .result-box span,
+.spell-result222 .result-box strong{
+  display:block;
+}
+.spell-result222 .result-box span{
+  color:var(--muted);
+  font-size:.75rem;
+}
+.spell-result222 .result-box strong{
+  color:var(--gold2);
+  font-size:1.3rem;
+}
+.spell-target-result222{
+  background:#17120d;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:11px;
+  text-align:left;
+}
+.spell-target-result222 b,
+.spell-target-result222 small{
+  display:block;
+}
+.spell-target-result222 small{
+  color:var(--muted);
+  margin-top:4px;
+}
+.combat-end222{
+  border:1px solid var(--gold2);
+  border-radius:18px;
+  padding:18px;
+  background:linear-gradient(180deg,#2a2116,#17120d);
+}
+@media(max-width:560px){
+  .spell-facts222,.spell-result222 .result-grid{grid-template-columns:1fr}
+}
+
 </style>
   <title>Forja de Héroes</title>
 </head>
@@ -7076,6 +7157,489 @@ window.addEventListener("DOMContentLoaded",()=>{
     },true);
   });
 });
+
+
+/* =========================================================
+   FORJA 2.2.2 · CONJUROS GUIADOS Y FINAL AUTOMÁTICO
+   ========================================================= */
+
+let spellResult222=null;
+let combatEnd222=null;
+
+const SPELL_RULES_222={
+  "rayo de fuego":{
+    attack:true,save:"",area:false,auto:false,heal:false,
+    dice:"1d10",damageType:"fuego",range:"36 m",
+    effect:"Ataque de conjuro a distancia contra una criatura."
+  },
+  "bola de fuego":{
+    attack:false,save:"Destreza",area:true,auto:false,heal:false,
+    dice:"8d6",damageType:"fuego",range:"45 m",
+    effect:"Explosión de 6 m de radio. Mitad de daño si supera la salvación."
+  },
+  "manos ardientes":{
+    attack:false,save:"Destreza",area:true,auto:false,heal:false,
+    dice:"3d6",damageType:"fuego",range:"Cono de 4,5 m",
+    effect:"Cono de fuego. Mitad de daño si supera la salvación."
+  },
+  "proyectil mágico":{
+    attack:false,save:"",area:true,auto:true,heal:false,
+    dice:"1d4+1 por dardo",damageType:"fuerza",range:"36 m",
+    effect:"Los dardos impactan automáticamente."
+  },
+  "dormir":{
+    attack:false,save:"",area:true,auto:true,heal:false,sleep:true,
+    dice:"5d8",damageType:"",range:"27 m, radio de 6 m",
+    effect:"Afecta primero a la criatura con menos PG. No causa daño."
+  },
+  "curar heridas":{
+    attack:false,save:"",area:false,auto:true,heal:true,
+    dice:"1d8 + modificador de conjuro",damageType:"curación",range:"Toque",
+    effect:"El objetivo recupera puntos de golpe."
+  },
+  "palabra sanadora":{
+    attack:false,save:"",area:false,auto:true,heal:true,
+    dice:"1d4 + modificador de conjuro",damageType:"curación",range:"18 m",
+    effect:"El objetivo recupera puntos de golpe."
+  },
+  "llama sagrada":{
+    attack:false,save:"Destreza",area:false,auto:false,heal:false,
+    dice:"1d8",damageType:"radiante",range:"18 m",
+    effect:"El objetivo realiza una salvación de Destreza; no recibe daño si la supera."
+  },
+  "rayo de escarcha":{
+    attack:true,save:"",area:false,auto:false,heal:false,
+    dice:"1d8",damageType:"frío",range:"18 m",
+    effect:"Ataque de conjuro a distancia; reduce la velocidad si impacta."
+  }
+};
+
+function enrichSpell222(spell){
+  const key=normalizeSimple(spell?.name||"");
+  const rule=SPELL_RULES_222[key];
+  if(!rule)return spell;
+  return {...spell,...rule,summary:spell.summary||rule.effect};
+}
+
+const OLD_SPELLS_222=spellsV2;
+spellsV2=function(character){
+  return OLD_SPELLS_222(character).map(enrichSpell222);
+};
+
+function spellResolutionLabel222(s){
+  if(s.heal)return"Curación";
+  if(s.auto)return"Impacto o efecto automático";
+  if(s.attack)return"Ataque de conjuro contra CA";
+  if(s.save)return`Salvación de ${s.save}`;
+  return"Efecto especial";
+}
+
+function spellFacts222(s,ch){
+  return `<div class="spell-facts222">
+    <span><b>Resolución</b><br>${escapeHtml(spellResolutionLabel222(s))}</span>
+    <span><b>Alcance</b><br>${escapeHtml(s.range||"Consultar descripción")}</span>
+    <span><b>Dados</b><br>${escapeHtml(s.dice||"Sin dados detectados")}</span>
+    <span><b>Tipo</b><br>${escapeHtml(s.damageType||"Efecto")}</span>
+    ${s.attack?`<span><b>Ataque mágico</b><br>${Number(ch?.spellAttackBonus??ch?.attackBonus??0)>=0?"+":""}${Number(ch?.spellAttackBonus??ch?.attackBonus??0)}</span>`:""}
+    ${s.save?`<span><b>CD de salvación</b><br>${ch?.spellSaveDC||"Consultar ficha"}</span>`:""}
+  </div>`;
+}
+
+/* Sustituye solo el recorrido de magia. */
+rSpellV2=function(box,s,a,ch){
+  const spells=spellsV2(ch);
+
+  if(s.step===1){
+    box.innerHTML=`<h3>Elige conjuro</h3>
+      <div class="guided-grid">${spells.map((x,i)=>`
+        <button class="guided-choice" data-spell222="${i}">
+          <b>${escapeHtml(x.name)}</b>
+          <small>${escapeHtml(spellResolutionLabel222(x))} · ${escapeHtml(x.dice||"Efecto")} · ${escapeHtml(x.range||"Alcance no indicado")}</small>
+        </button>`).join("")||"<p>No hay conjuros registrados.</p>"}</div>`;
+    document.querySelectorAll("[data-spell222]").forEach(button=>{
+      button.onclick=()=>{
+        s.spell=spells[Number(button.dataset.spell222)];
+        s.step=2;
+        renderGV2();
+      };
+    });
+    return;
+  }
+
+  if(s.step===2){
+    const spell=s.spell;
+    box.innerHTML=`<div class="spell-card222">
+        <h3>${escapeHtml(spell.name)}</h3>
+        <p>${escapeHtml(spell.effect||spell.summary||"Consulta la descripción del conjuro.")}</p>
+        ${spellFacts222(spell,ch)}
+      </div>
+      <div class="guided-actions">
+        <button class="ghost" id="spellBack222">← Atrás</button>
+        <button class="primary" id="spellTargets222">Elegir objetivo${spell.area?"s":""}</button>
+      </div>`;
+    document.querySelector("#spellBack222").onclick=()=>{s.step=1;renderGV2()};
+    document.querySelector("#spellTargets222").onclick=()=>{s.step=3;renderGV2()};
+    return;
+  }
+
+  if(s.step===3){
+    const friendly=["players","allies"];
+    const targets=s.spell.heal
+      ? geV2().combatants.filter(t=>t.hp>0&&(friendly.includes(a.team)?friendly.includes(t.team):t.team==="enemies"))
+      : validEncounterTargets(geV2(),a);
+    const type=s.spell.area?"checkbox":"radio";
+    box.innerHTML=`<h3>${s.spell.area?"Selecciona criaturas afectadas":"Selecciona objetivo"}</h3>
+      ${targets.map(t=>`<label class="guided-target-row">
+        <input type="${type}" name="spellTarget222" value="${t.id}">
+        <span><b>${escapeHtml(t.name)}</b><small>CA ${t.ac} · PG ${t.hp}/${t.maxHp}</small></span>
+        <span>${teamNameV101c(t.team)}</span>
+      </label>`).join("")}
+      <div class="guided-actions">
+        <button class="ghost" id="spellBackTarget222">← Atrás</button>
+        <button class="primary" id="spellResolve222">Continuar</button>
+      </div>`;
+    document.querySelector("#spellBackTarget222").onclick=()=>{s.step=2;renderGV2()};
+    document.querySelector("#spellResolve222").onclick=()=>{
+      s.targetIds=[...document.querySelectorAll('input[name="spellTarget222"]:checked')].map(x=>x.value);
+      if(!s.targetIds.length)return alert("Selecciona al menos un objetivo.");
+      s.step=4;
+      renderGV2();
+    };
+    return;
+  }
+
+  if(s.step===4 && s.spell.attack){
+    const target=geV2().combatants.find(t=>t.id===s.targetIds[0]);
+    const bonus=Number(ch?.spellAttackBonus??ch?.attackBonus??0);
+    box.innerHTML=`<h3>Ataque de conjuro</h3>
+      <p>Tira 1d20. Se sumará ${bonus>=0?"+":""}${bonus} y se comparará con la CA ${target.ac} de ${escapeHtml(target.name)}.</p>
+      <input id="spellRoll222" class="guided-number" inputmode="numeric" placeholder="Resultado del d20">
+      <div class="guided-actions">
+        <button class="ghost" id="spellBackRoll222">← Atrás</button>
+        <button class="primary" id="spellCalc222">Calcular</button>
+      </div>`;
+    document.querySelector("#spellBackRoll222").onclick=()=>{s.step=3;renderGV2()};
+    document.querySelector("#spellCalc222").onclick=()=>{
+      const roll=Number(document.querySelector("#spellRoll222").value);
+      if(!Number.isFinite(roll))return alert("Introduce el resultado del d20.");
+      s.roll=roll;s.bonus=bonus;s.total=roll+bonus;
+      s.hit=roll===20||(roll!==1&&s.total>=target.ac);
+      if(!s.hit){
+        finishSpell222(0);
+      }else{
+        s.step=5;renderGV2();
+      }
+    };
+    return;
+  }
+
+  if(s.step===4 && s.spell.save){
+    box.innerHTML=`<h3>Salvaciones de ${escapeHtml(s.spell.save)}</h3>
+      <p>Introduce el resultado total de cada criatura contra CD ${ch?.spellSaveDC||"según ficha"}.</p>
+      ${s.targetIds.map(id=>{
+        const t=geV2().combatants.find(x=>x.id===id);
+        return `<label class="guided-target-row">
+          <span>${escapeHtml(t.name)}</span>
+          <input data-spell-save222="${id}" inputmode="numeric" placeholder="Total">
+          <span>CD ${ch?.spellSaveDC||"?"}</span>
+        </label>`;
+      }).join("")}
+      <div class="guided-actions">
+        <button class="ghost" id="spellBackSave222">← Atrás</button>
+        <button class="primary" id="spellContinueSave222">Continuar</button>
+      </div>`;
+    document.querySelector("#spellBackSave222").onclick=()=>{s.step=3;renderGV2()};
+    document.querySelector("#spellContinueSave222").onclick=()=>{
+      s.saves={};
+      document.querySelectorAll("[data-spell-save222]").forEach(input=>{
+        const value=Number(input.value);
+        if(Number.isFinite(value))s.saves[input.dataset.spellSave222]=value;
+      });
+      s.step=5;renderGV2();
+    };
+    return;
+  }
+
+  s.step=5;
+  const instruction=s.spell.sleep
+    ? `Tira ${s.spell.dice||"los dados indicados"} y escribe el total. Se aplicará empezando por la criatura con menos PG.`
+    : s.spell.heal
+      ? `Tira ${s.spell.dice||"los dados de curación"} y escribe la curación total.`
+      : `Tira ${s.spell.dice||"los dados de daño indicados"} y escribe el daño total de ${s.spell.damageType||"conjuro"}.`;
+
+  box.innerHTML=`<div class="spell-card222">
+      <h3>${escapeHtml(s.spell.name)}</h3>
+      <p>${escapeHtml(instruction)}</p>
+      ${spellFacts222(s.spell,ch)}
+    </div>
+    <input id="spellEffect222" class="guided-number" inputmode="numeric" placeholder="${s.spell.heal?"Curación":"Daño total"}">
+    <div class="guided-actions">
+      <button class="ghost" id="spellBackEffect222">← Atrás</button>
+      <button class="primary" id="spellApply222">Aplicar</button>
+    </div>`;
+  document.querySelector("#spellBackEffect222").onclick=()=>{s.step=s.spell.attack||s.spell.save?4:3;renderGV2()};
+  document.querySelector("#spellApply222").onclick=()=>{
+    const value=Number(document.querySelector("#spellEffect222").value||0);
+    if(!Number.isFinite(value)||value<0)return alert("Introduce un resultado válido.");
+    finishSpell222(value);
+  };
+};
+
+function finishSpell222(value){
+  const e=geV2(),s=guidedStateV2,a=gcV2(),ch=gcharV2(a);
+  const spell=s.spell;
+  const results=[];
+  snapV2("conjuro "+spell.name);
+
+  if(spell.attack && s.hit===false){
+    const target=e.combatants.find(t=>t.id===s.targetIds[0]);
+    results.push({
+      targetId:target.id,name:target.name,before:target.hp,after:target.hp,
+      amount:0,hit:false,defeated:false,text:"El ataque de conjuro falla."
+    });
+  }else if(spell.sleep){
+    let pool=value;
+    const targets=s.targetIds.map(id=>e.combatants.find(t=>t.id===id)).filter(Boolean).sort((x,y)=>x.hp-y.hp);
+    for(const target of targets){
+      const before=target.hp;
+      let affected=false;
+      if(pool>=target.hp){
+        pool-=target.hp;
+        target.conditions=Array.from(new Set([...(target.conditions||[]),"Dormido"]));
+        affected=true;
+      }
+      results.push({
+        targetId:target.id,name:target.name,before,after:target.hp,
+        amount:0,hit:affected,defeated:false,
+        text:affected?"Queda dormido.":"No queda afectado."
+      });
+    }
+  }else{
+    for(const id of s.targetIds){
+      const target=e.combatants.find(t=>t.id===id);
+      if(!target)continue;
+      const before=target.hp;
+
+      if(spell.heal){
+        target.hp=Math.min(target.maxHp,target.hp+value);
+        const restored=target.hp-before;
+        results.push({
+          targetId:target.id,name:target.name,before,after:target.hp,
+          amount:restored,hit:true,defeated:false,
+          text:`Recupera ${restored} PG.`
+        });
+        continue;
+      }
+
+      let hit=true;
+      let amount=value;
+
+      if(spell.attack){
+        hit=s.roll===20||(s.roll!==1&&s.total>=target.ac);
+        if(!hit)amount=0;
+      }
+
+      if(spell.save){
+        const dc=Number(ch?.spellSaveDC||0);
+        const save=Number(s.saves?.[id]);
+        const success=dc&&Number.isFinite(save)&&save>=dc;
+        if(success){
+          /* Llama sagrada y efectos similares no hacen daño al superar.
+             Las áreas habituales hacen la mitad. */
+          amount=normalizeSimple(spell.name)==="llama sagrada" ? 0 : Math.floor(value/2);
+        }
+      }
+
+      if(amount>0)applyMasterDamage(target,amount);
+      if(target.hp<=0){
+        target.conditions=Array.from(new Set([...(target.conditions||[]),"Derrotado"]));
+      }
+
+      results.push({
+        targetId:target.id,name:target.name,before,after:target.hp,
+        amount,hit,defeated:target.hp<=0,
+        text:!hit?"El ataque falla.":target.hp<=0?"Ha sido derrotado.":`Le quedan ${target.hp} PG.`
+      });
+    }
+  }
+
+  masterLog(
+    e,
+    spell.name,
+    `${a.name} usa ${spell.name}. ${results.map(r=>`${r.name}: ${r.text}${r.amount?` Daño/efecto ${r.amount}.`:""}`).join(" ")}`
+  );
+  saveEncounters();
+
+  spellResult222={
+    encounterId:e.id,
+    actorId:a.id,
+    spellName:spell.name,
+    spell,
+    roll:s.roll,
+    total:s.total,
+    value,
+    results
+  };
+
+  document.querySelector("#guidedOverlayV2").classList.remove("active");
+  guidedStateV2=null;
+  flow21.stage="spellResult222";
+  renderFlow21();
+}
+
+function renderSpellResult222(box,e){
+  const r=spellResult222;
+  const actor=e.combatants.find(c=>c.id===r.actorId);
+  const defeated=r.results.filter(x=>x.defeated).length;
+  const anyDamage=r.results.some(x=>x.amount>0&&!r.spell.heal);
+
+  box.innerHTML=f21Card(`<div class="spell-result222">
+    <div class="icon">${defeated?"💥":(r.spell.heal?"❤️":anyDamage?"🔥":"✨")}</div>
+    <p class="eyebrow">Resultado del conjuro</p>
+    <h2 class="flow21-title">${escapeHtml(actor.name)} lanza ${escapeHtml(r.spellName)}</h2>
+
+    <div class="result-grid">
+      <div class="result-box"><span>Resolución</span><strong>${escapeHtml(spellResolutionLabel222(r.spell))}</strong></div>
+      <div class="result-box"><span>Dados</span><strong>${escapeHtml(r.spell.dice||"Efecto")}</strong></div>
+      <div class="result-box"><span>Resultado</span><strong>${r.value||r.total||"—"}</strong></div>
+    </div>
+
+    ${r.results.map(item=>`
+      <div class="spell-target-result222">
+        <b>${escapeHtml(item.name)}</b>
+        <small>${item.before} → ${item.after} PG${item.amount?` · ${item.amount} ${r.spell.heal?"curados":"de daño"}`:""}</small>
+        <small>${escapeHtml(item.text)}</small>
+      </div>`).join("")}
+
+    <div class="flow21-actions">
+      <button class="ghost" id="spellResultLog222">Ver registro</button>
+      <button class="primary" id="spellResultContinue222">Continuar</button>
+    </div>
+  </div>`);
+
+  document.querySelector("#spellResultLog222").onclick=()=>{
+    document.body.classList.remove("flow21-mode");
+    activeEncounterId=e.id;
+    renderInitiativeTracker();
+    showView("initiativeTracker");
+  };
+  document.querySelector("#spellResultContinue222").onclick=()=>{
+    spellResult222=null;
+    const outcome=detectCombatOutcome222(e);
+    if(outcome){
+      combatEnd222=outcome;
+      flow21.stage="combatEnd222";
+    }else{
+      flow21.stage="turn";
+    }
+    renderFlow21();
+  };
+}
+
+function activeSide222(team){
+  const friendly=["players","allies"];
+  return friendly.includes(team)?"players":team;
+}
+function isCombatantActive222(c){
+  if(Number(c.hp)<=0)return false;
+  const conditions=(c.conditions||[]).map(normalizeSimple);
+  return !conditions.includes("derrotado")&&!conditions.includes("inconsciente");
+}
+function detectCombatOutcome222(e){
+  const players=e.combatants.filter(c=>["players","allies"].includes(c.team));
+  const enemies=e.combatants.filter(c=>c.team==="enemies");
+  const activePlayers=players.filter(isCombatantActive222);
+  const activeEnemies=enemies.filter(isCombatantActive222);
+
+  if(enemies.length&&activeEnemies.length===0&&activePlayers.length>0){
+    return {
+      type:"victory",title:"Victoria",
+      message:"Todos los enemigos han quedado fuera de combate.",
+      defeated:enemies.filter(c=>!isCombatantActive222(c)).map(c=>c.name),
+      conscious:activePlayers.map(c=>c.name)
+    };
+  }
+  if(players.length&&activePlayers.length===0&&activeEnemies.length>0){
+    return {
+      type:"defeat",title:"Derrota",
+      message:"No queda ningún personaje consciente en combate.",
+      defeated:players.filter(c=>!isCombatantActive222(c)).map(c=>c.name),
+      conscious:activeEnemies.map(c=>c.name)
+    };
+  }
+  return null;
+}
+
+function renderCombatEnd222(box,e){
+  const r=combatEnd222;
+  box.innerHTML=f21Card(`<div class="combat-end222">
+    <div class="icon">${r.type==="victory"?"🏆":"💀"}</div>
+    <p class="eyebrow">Combate resuelto</p>
+    <h2 class="flow21-title">${escapeHtml(r.title)}</h2>
+    <p>${escapeHtml(r.message)}</p>
+    <div class="flow21-status">
+      <span>Rondas: ${e.round}</span>
+      <span>Fuera de combate: ${r.defeated.length}</span>
+      <span>Activos: ${r.conscious.length}</span>
+    </div>
+    <p class="flow21-mini">${r.defeated.length?`Fuera de combate: ${escapeHtml(r.defeated.join(", "))}`:""}</p>
+    <div class="flow21-actions">
+      <button class="ghost" id="combatContinue222">Continuar encuentro</button>
+      <button class="primary" id="combatFinish222">Finalizar y guardar</button>
+    </div>
+  </div>`);
+
+  document.querySelector("#combatContinue222").onclick=()=>{
+    combatEnd222=null;
+    flow21.stage="turn";
+    renderFlow21();
+  };
+  document.querySelector("#combatFinish222").onclick=()=>{
+    combatEnd222=null;
+    finishEncounter(e);
+  };
+}
+
+/* Añade los nuevos estados al render sin tocar los anteriores. */
+const OLD_RENDER_FLOW_222=renderFlow21;
+renderFlow21=function(){
+  const box=document.querySelector("#combatFlow21Content");
+  const e=f21Encounter();
+  if(flow21.stage==="spellResult222")return renderSpellResult222(box,e);
+  if(flow21.stage==="combatEnd222")return renderCombatEnd222(box,e);
+
+  const result=OLD_RENDER_FLOW_222();
+
+  /* Comprueba el final también tras resultados físicos o de monstruos. */
+  setTimeout(()=>{
+    const playerContinue=document.querySelector("#cont22");
+    if(playerContinue&&!playerContinue.dataset.outcome222){
+      playerContinue.dataset.outcome222="1";
+      playerContinue.addEventListener("click",event=>{
+        const outcome=detectCombatOutcome222(e);
+        if(outcome){
+          event.preventDefault();event.stopImmediatePropagation();
+          playerResult22=null;combatEnd222=outcome;flow21.stage="combatEnd222";renderFlow21();
+        }
+      },true);
+    }
+
+    const monsterContinue=document.querySelector("#mrContinue21");
+    if(monsterContinue&&!monsterContinue.dataset.outcome222){
+      monsterContinue.dataset.outcome222="1";
+      monsterContinue.addEventListener("click",event=>{
+        const outcome=detectCombatOutcome222(e);
+        if(outcome){
+          event.preventDefault();event.stopImmediatePropagation();
+          monsterResult21=null;combatEnd222=outcome;flow21.stage="combatEnd222";renderFlow21();
+        }
+      },true);
+    }
+  },0);
+
+  return result;
+};
+
 </script>
 
 <div id="guidedOverlayV2" class="guided-overlay"><div class="guided-sheet">
