@@ -790,6 +790,21 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
   .spell-facts222,.spell-result222 .result-grid{grid-template-columns:1fr}
 }
 
+
+/* =========================================================
+   FORJA 2.2.3 · REANUDACIÓN SEGURA
+   ========================================================= */
+.resume-combat223{
+  background:linear-gradient(180deg,#2a2116,#17120d);
+  border:1px solid var(--gold2);
+  border-radius:14px;
+  padding:12px;
+  margin:10px 0;
+}
+.resume-combat223 b,.resume-combat223 small{display:block}
+.resume-combat223 small{color:var(--muted);margin-top:4px}
+.resume-combat223 button{margin-top:9px;width:100%}
+
 </style>
   <title>Forja de Héroes</title>
 </head>
@@ -7639,6 +7654,246 @@ renderFlow21=function(){
 
   return result;
 };
+
+
+
+/* =========================================================
+   FORJA 2.2.3 · MENSAJE DE FALLO Y REANUDACIÓN DEL COMBATE
+   ========================================================= */
+const ACTIVE_COMBAT_223_KEY="forja_active_combat_223";
+
+function saveActiveCombat223(){
+  const encounter=f21Encounter();
+  if(!encounter)return;
+  const payload={
+    encounterId:encounter.id,
+    stage:flow21.stage||"turn",
+    initiativeIndex:flow21.initiativeIndex||0,
+    turnIndex:encounter.turnIndex||0,
+    round:encounter.round||1,
+    monsterResult:monsterResult21||null,
+    playerResult:playerResult22||null,
+    spellResult:spellResult222||null,
+    combatEnd:combatEnd222||null,
+    savedAt:new Date().toISOString()
+  };
+  localStorage.setItem(ACTIVE_COMBAT_223_KEY,JSON.stringify(payload));
+  localStorage.setItem(ACTIVE_ENCOUNTER_22_KEY,JSON.stringify(payload));
+  saveEncounters();
+}
+
+function loadActiveCombat223(){
+  let saved=null;
+  try{
+    saved=JSON.parse(
+      localStorage.getItem(ACTIVE_COMBAT_223_KEY)||
+      localStorage.getItem(ACTIVE_ENCOUNTER_22_KEY)||
+      "null"
+    );
+  }catch(error){}
+  if(!saved)return null;
+
+  const encounter=encounterById(saved.encounterId);
+  if(!encounter||encounter.status==="Finalizado"){
+    localStorage.removeItem(ACTIVE_COMBAT_223_KEY);
+    return null;
+  }
+  return {saved,encounter};
+}
+
+function resumeActiveCombat223(){
+  const loaded=loadActiveCombat223();
+  if(!loaded){
+    alert("No hay ningún encuentro activo que reanudar.");
+    return;
+  }
+  const {saved,encounter}=loaded;
+  encounter.turnIndex=Math.min(
+    Number(saved.turnIndex||encounter.turnIndex||0),
+    Math.max(0,encounter.combatants.length-1)
+  );
+  encounter.round=Number(saved.round||encounter.round||1);
+
+  monsterResult21=saved.monsterResult||null;
+  playerResult22=saved.playerResult||null;
+  spellResult222=saved.spellResult||null;
+  combatEnd222=saved.combatEnd||null;
+
+  /* Si se guardó una pantalla de resultado pero su información ya no está,
+     regresamos al turno en lugar de dejar una pantalla vacía. */
+  let stage=saved.stage||"turn";
+  if(stage==="monsterResult"&&!monsterResult21)stage="turn";
+  if(stage==="playerResult22"&&!playerResult22)stage="turn";
+  if(stage==="spellResult222"&&!spellResult222)stage="turn";
+  if(stage==="combatEnd222"&&!combatEnd222)stage="turn";
+
+  flow21={
+    encounterId:encounter.id,
+    stage,
+    initiativeIndex:Number(saved.initiativeIndex||0),
+    action:null
+  };
+  activeEncounterId=encounter.id;
+  document.body.classList.add("flow21-mode");
+  showView("combatFlow21");
+  renderFlow21();
+}
+
+function resumePanel223(){
+  const loaded=loadActiveCombat223();
+  if(!loaded)return "";
+  const {saved,encounter}=loaded;
+  const current=encounter.combatants[encounter.turnIndex];
+  return `<div class="resume-combat223">
+    <b>Encuentro en curso: ${escapeHtml(encounter.name)}</b>
+    <small>Ronda ${encounter.round} · Turno de ${escapeHtml(current?.name||"—")}</small>
+    <button class="primary" data-resume-combat223>Volver al combate</button>
+  </div>`;
+}
+
+function bindResumeButtons223(root=document){
+  root.querySelectorAll("[data-resume-combat223]").forEach(button=>{
+    button.onclick=resumeActiveCombat223;
+  });
+}
+
+function injectResumePanel223(selector){
+  const root=document.querySelector(selector);
+  if(!root)return;
+  root.querySelectorAll(".resume-combat223").forEach(node=>node.remove());
+  const markup=resumePanel223();
+  if(!markup)return;
+  root.insertAdjacentHTML("afterbegin",markup);
+  bindResumeButtons223(root);
+}
+
+/* Fuerza el nuevo selector visual de acciones del monstruo.
+   El flujo anterior utilizaba un prompt y omitía la pantalla de resultado
+   cuando el ataque fallaba. */
+const FORJA_223_OLD_RTURN=rTurn21;
+rTurn21=function(box,encounter){
+  FORJA_223_OLD_RTURN(box,encounter);
+
+  const monsterButton=document.querySelector('[data-f21act="monster"]');
+  if(monsterButton){
+    monsterButton.addEventListener("click",event=>{
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      const attacker=f21Current();
+      const monster=masterMonsterForCombatant(attacker);
+      const actions=monster?.actions||[];
+      if(!actions.length){
+        openGV2("other");
+        return;
+      }
+      showMonsterActionPicker21(encounter,attacker,actions);
+    },true);
+  }
+
+  const viewButton=document.querySelector("#f21view");
+  if(viewButton){
+    viewButton.addEventListener("click",()=>{
+      saveActiveCombat223();
+    },true);
+  }
+};
+
+/* Conserva el resultado, incluido «Goblin falla», al abrir el registro. */
+const FORJA_223_OLD_MONSTER_RESULT=renderMonsterResult21;
+renderMonsterResult21=function(box,encounter){
+  FORJA_223_OLD_MONSTER_RESULT(box,encounter);
+  saveActiveCombat223();
+
+  const logButton=document.querySelector("#mrLog21");
+  if(logButton){
+    logButton.onclick=()=>{
+      saveActiveCombat223();
+      document.body.classList.remove("flow21-mode");
+      activeEncounterId=encounter.id;
+      renderInitiativeTracker();
+      showView("initiativeTracker");
+      injectResumePanel223("#initiativeTracker");
+    };
+  }
+};
+
+/* Aplica la misma protección a ataques de jugadores y conjuros. */
+const FORJA_223_OLD_PLAYER_RESULT=renderPlayerResult22;
+renderPlayerResult22=function(box,encounter){
+  FORJA_223_OLD_PLAYER_RESULT(box,encounter);
+  saveActiveCombat223();
+};
+
+const FORJA_223_OLD_SPELL_RESULT=renderSpellResult222;
+renderSpellResult222=function(box,encounter){
+  FORJA_223_OLD_SPELL_RESULT(box,encounter);
+  saveActiveCombat223();
+
+  const logButton=document.querySelector("#spellResultLog222");
+  if(logButton){
+    logButton.onclick=()=>{
+      saveActiveCombat223();
+      document.body.classList.remove("flow21-mode");
+      activeEncounterId=encounter.id;
+      renderInitiativeTracker();
+      showView("initiativeTracker");
+      injectResumePanel223("#initiativeTracker");
+    };
+  }
+};
+
+/* Guarda ronda, turno y pantalla activa después de cada render. */
+const FORJA_223_OLD_RENDER_FLOW=renderFlow21;
+renderFlow21=function(){
+  const result=FORJA_223_OLD_RENDER_FLOW();
+  saveActiveCombat223();
+  return result;
+};
+
+/* El registro completo siempre muestra un regreso claro al combate. */
+const FORJA_223_OLD_RENDER_TRACKER=renderInitiativeTracker;
+renderInitiativeTracker=function(){
+  FORJA_223_OLD_RENDER_TRACKER();
+  injectResumePanel223("#initiativeTracker");
+};
+
+/* La lista de encuentros y la portada recuperan el acceso cada vez que
+   se vuelven a renderizar, no solo al abrir la aplicación. */
+const FORJA_223_OLD_RENDER_ENCOUNTERS=renderEncounters;
+renderEncounters=function(){
+  FORJA_223_OLD_RENDER_ENCOUNTERS();
+  injectResumePanel223("#encounters");
+};
+
+const FORJA_223_OLD_SHOW_VIEW=showView;
+showView=function(id){
+  /* Antes de salir de la consola se conserva el combate. */
+  if(flow21?.encounterId&&id!=="combatFlow21"){
+    saveActiveCombat223();
+  }
+  FORJA_223_OLD_SHOW_VIEW(id);
+
+  if(id==="home")injectResumePanel223("#home");
+  if(id==="encounters")injectResumePanel223("#encounters");
+  if(id==="initiativeTracker")injectResumePanel223("#initiativeTracker");
+};
+
+/* Solo se elimina la reanudación cuando el Director finaliza realmente. */
+const FORJA_223_OLD_FINISH_ENCOUNTER=finishEncounter;
+finishEncounter=function(encounter){
+  const result=FORJA_223_OLD_FINISH_ENCOUNTER(encounter);
+  if(encounter?.status==="Finalizado"){
+    localStorage.removeItem(ACTIVE_COMBAT_223_KEY);
+    localStorage.removeItem(ACTIVE_ENCOUNTER_22_KEY);
+  }
+  return result;
+};
+
+window.addEventListener("DOMContentLoaded",()=>{
+  injectResumePanel223("#home");
+  injectResumePanel223("#encounters");
+});
 
 </script>
 
