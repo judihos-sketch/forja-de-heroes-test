@@ -805,6 +805,62 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 .resume-combat223 small{color:var(--muted);margin-top:4px}
 .resume-combat223 button{margin-top:9px;width:100%}
 
+
+/* =========================================================
+   FORJA 2.3 · MOTOR UNIFICADO Y DATOS ESTRUCTURADOS
+   ========================================================= */
+.rule-card23{
+  background:#17120d;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  margin:10px 0;
+}
+.rule-card23 h3{margin:.1rem 0 .5rem}
+.rule-grid23{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+.rule-grid23 span{
+  background:#120f0b;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px;
+  font-size:.82rem;
+}
+.rule-grid23 b{display:block;color:var(--gold2);margin-bottom:3px}
+.action-result23{
+  text-align:center;
+  display:grid;
+  gap:12px;
+}
+.action-result23 .icon{font-size:3.2rem}
+.action-result23 .numbers{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.action-result23 .box{
+  background:#17120d;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:11px;
+}
+.action-result23 .box span,.action-result23 .box strong{display:block}
+.action-result23 .box span{color:var(--muted);font-size:.74rem}
+.action-result23 .box strong{color:var(--gold2);font-size:1.3rem}
+.target-state23{
+  background:#17120d;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+}
+@media(max-width:560px){
+  .rule-grid23,.action-result23 .numbers{grid-template-columns:1fr}
+}
+
 </style>
   <title>Forja de Héroes</title>
 </head>
@@ -7894,6 +7950,387 @@ window.addEventListener("DOMContentLoaded",()=>{
   injectResumePanel223("#home");
   injectResumePanel223("#encounters");
 });
+
+
+
+/* =========================================================
+   FORJA 2.3 · BASE DE DATOS Y MOTOR DE RESOLUCIÓN UNIFICADO
+   ========================================================= */
+const SPELL_DB_23={
+  "saeta de fuego":{
+    canonical:"Descarga de fuego",level:0,school:"Evocación",
+    resolution:"spellAttack",range:"36 m",targets:1,area:false,
+    damageByLevel:[[1,"1d10"],[5,"2d10"],[11,"3d10"],[17,"4d10"]],
+    damageType:"fuego",components:"V, S",duration:"Instantáneo",
+    effect:"Haz un ataque de conjuro a distancia. Si impacta, causa daño de fuego. Los objetos inflamables desatendidos empiezan a arder."
+  },
+  "descarga de fuego":{
+    canonical:"Descarga de fuego",level:0,school:"Evocación",
+    resolution:"spellAttack",range:"36 m",targets:1,area:false,
+    damageByLevel:[[1,"1d10"],[5,"2d10"],[11,"3d10"],[17,"4d10"]],
+    damageType:"fuego",components:"V, S",duration:"Instantáneo",
+    effect:"Haz un ataque de conjuro a distancia. Si impacta, causa daño de fuego. Los objetos inflamables desatendidos empiezan a arder."
+  },
+  "rayo de escarcha":{
+    canonical:"Rayo de escarcha",level:0,school:"Evocación",
+    resolution:"spellAttack",range:"18 m",targets:1,area:false,
+    damageByLevel:[[1,"1d8"],[5,"2d8"],[11,"3d8"],[17,"4d8"]],
+    damageType:"frío",components:"V, S",duration:"Instantáneo",
+    effect:"Si impacta, causa daño de frío y reduce la velocidad del objetivo hasta el inicio de tu siguiente turno."
+  },
+  "descarga sobrenatural":{
+    canonical:"Descarga sobrenatural",level:0,school:"Evocación",
+    resolution:"spellAttack",range:"36 m",targets:1,area:false,
+    damageByLevel:[[1,"1d10"],[5,"2 rayos de 1d10"],[11,"3 rayos de 1d10"],[17,"4 rayos de 1d10"]],
+    damageType:"fuerza",components:"V, S",duration:"Instantáneo",
+    effect:"Haz un ataque de conjuro a distancia por cada rayo. Puedes dirigirlos al mismo objetivo o a objetivos distintos."
+  },
+  "llama sagrada":{
+    canonical:"Llama sagrada",level:0,school:"Evocación",
+    resolution:"savingThrow",save:"Destreza",saveEffect:"none",
+    range:"18 m",targets:1,area:false,
+    damageByLevel:[[1,"1d8"],[5,"2d8"],[11,"3d8"],[17,"4d8"]],
+    damageType:"radiante",components:"V, S",duration:"Instantáneo",
+    effect:"El objetivo realiza una salvación de Destreza. Si falla, recibe daño radiante; si la supera, no recibe daño."
+  },
+  "proyectil magico":{
+    canonical:"Proyectil mágico",level:1,school:"Evocación",
+    resolution:"automatic",range:"36 m",targets:3,area:true,
+    damage:"1d4+1 por dardo",damageType:"fuerza",
+    components:"V, S",duration:"Instantáneo",
+    effect:"Crea tres dardos que impactan automáticamente. Cada dardo causa 1d4+1 de fuerza. Puedes repartirlos."
+  },
+  "proyectil mágico":{
+    canonical:"Proyectil mágico",level:1,school:"Evocación",
+    resolution:"automatic",range:"36 m",targets:3,area:true,
+    damage:"1d4+1 por dardo",damageType:"fuerza",
+    components:"V, S",duration:"Instantáneo",
+    effect:"Crea tres dardos que impactan automáticamente. Cada dardo causa 1d4+1 de fuerza. Puedes repartirlos."
+  },
+  "dormir":{
+    canonical:"Dormir",level:1,school:"Encantamiento",
+    resolution:"pool",range:"27 m",targets:"Área de 6 m",area:true,
+    damage:"5d8 PG afectados",damageType:"",components:"V, S, M",
+    duration:"1 minuto",
+    effect:"Tira 5d8. Afecta primero a la criatura con menos PG actuales. Las criaturas afectadas quedan inconscientes hasta que termine el conjuro, reciban daño o alguien las despierte."
+  },
+  "manos ardientes":{
+    canonical:"Manos ardientes",level:1,school:"Evocación",
+    resolution:"savingThrow",save:"Destreza",saveEffect:"half",
+    range:"Cono de 4,5 m",targets:"Área",area:true,
+    damage:"3d6",damageType:"fuego",components:"V, S",duration:"Instantáneo",
+    effect:"Cada criatura en el cono hace una salvación de Destreza. Recibe todo el daño si falla y la mitad si la supera."
+  },
+  "curar heridas":{
+    canonical:"Curar heridas",level:1,school:"Abjuración",
+    resolution:"healing",range:"Toque",targets:1,area:false,
+    damage:"1d8 + modificador de aptitud mágica",damageType:"curación",
+    components:"V, S",duration:"Instantáneo",
+    effect:"Una criatura tocada recupera puntos de golpe."
+  },
+  "palabra sanadora":{
+    canonical:"Palabra sanadora",level:1,school:"Abjuración",
+    resolution:"healing",range:"18 m",targets:1,area:false,
+    damage:"1d4 + modificador de aptitud mágica",damageType:"curación",
+    components:"V",duration:"Instantáneo",
+    effect:"Una criatura que puedas ver recupera puntos de golpe."
+  },
+  "infligir heridas":{
+    canonical:"Infligir heridas",level:1,school:"Nigromancia",
+    resolution:"spellAttack",range:"Toque",targets:1,area:false,
+    damage:"3d10",damageType:"necrótico",
+    components:"V, S",duration:"Instantáneo",
+    effect:"Haz un ataque de conjuro cuerpo a cuerpo. Si impacta, causa daño necrótico."
+  },
+  "saeta guia":{
+    canonical:"Saeta guía",level:1,school:"Evocación",
+    resolution:"spellAttack",range:"36 m",targets:1,area:false,
+    damage:"4d6",damageType:"radiante",
+    components:"V, S",duration:"1 ronda",
+    effect:"Si impacta, causa daño radiante. El siguiente ataque contra el objetivo antes del final de tu siguiente turno tiene ventaja."
+  },
+  "saeta guía":{
+    canonical:"Saeta guía",level:1,school:"Evocación",
+    resolution:"spellAttack",range:"36 m",targets:1,area:false,
+    damage:"4d6",damageType:"radiante",
+    components:"V, S",duration:"1 ronda",
+    effect:"Si impacta, causa daño radiante. El siguiente ataque contra el objetivo antes del final de tu siguiente turno tiene ventaja."
+  },
+  "bola de fuego":{
+    canonical:"Bola de fuego",level:3,school:"Evocación",
+    resolution:"savingThrow",save:"Destreza",saveEffect:"half",
+    range:"45 m; esfera de 6 m",targets:"Área",area:true,
+    damage:"8d6",damageType:"fuego",
+    components:"V, S, M",duration:"Instantáneo",
+    effect:"Cada criatura en el área realiza una salvación de Destreza. Recibe todo el daño si falla y la mitad si la supera."
+  }
+};
+
+function characterLevel23(character){
+  return Math.max(1,Number(character?.level||1));
+}
+function scaledDamage23(rule,character){
+  if(!rule?.damageByLevel)return rule?.damage||"Sin daño";
+  const lvl=characterLevel23(character);
+  let result=rule.damageByLevel[0][1];
+  rule.damageByLevel.forEach(([min,dice])=>{if(lvl>=min)result=dice});
+  return result;
+}
+function spellAttackBonus23(character){
+  if(Number.isFinite(Number(character?.spellAttackBonus)))return Number(character.spellAttackBonus);
+  const ability=Number(character?.spellcastingModifier??character?.magicModifier??0);
+  const prof=Number(character?.proficiencyBonus??2);
+  return ability+prof;
+}
+function spellSaveDC23(character){
+  if(Number.isFinite(Number(character?.spellSaveDC)))return Number(character.spellSaveDC);
+  const ability=Number(character?.spellcastingModifier??character?.magicModifier??0);
+  const prof=Number(character?.proficiencyBonus??2);
+  return 8+ability+prof;
+}
+function spellRule23(name,character){
+  const key=normalizeSimple(name||"");
+  const base=SPELL_DB_23[key];
+  if(base)return {...base,name:base.canonical,damage:scaledDamage23(base,character)};
+  const fallback=spellsV2(character).find(s=>normalizeSimple(s.name)===key);
+  return {
+    name:name,canonical:name,level:fallback?.level||0,school:"",
+    resolution:fallback?.attack?"spellAttack":fallback?.save?"savingThrow":fallback?.heal?"healing":fallback?.auto?"automatic":"manual",
+    save:fallback?.save||"",saveEffect:"half",range:fallback?.range||"No registrado",
+    targets:fallback?.area?"Varios":1,area:!!fallback?.area,
+    damage:fallback?.dice||"No registrado",damageType:"",
+    components:"No registrados",duration:"No registrada",
+    effect:fallback?.summary||"Este conjuro todavía no tiene una regla estructurada completa."
+  };
+}
+function resolutionText23(rule){
+  return {
+    spellAttack:"Ataque de conjuro contra la CA",
+    savingThrow:`Salvación de ${rule.save||"característica"}`,
+    automatic:"Impacto automático",
+    healing:"Curación",
+    pool:"Reserva de PG",
+    manual:"Efecto especial"
+  }[rule.resolution]||"Efecto especial";
+}
+function ruleCard23(rule,character){
+  return `<div class="rule-card23">
+    <h3>${escapeHtml(rule.name||rule.canonical)}</h3>
+    <p>${escapeHtml(rule.effect||"")}</p>
+    <div class="rule-grid23">
+      <span><b>Resolución</b>${escapeHtml(resolutionText23(rule))}</span>
+      <span><b>Alcance</b>${escapeHtml(String(rule.range||"—"))}</span>
+      <span><b>Objetivos</b>${escapeHtml(String(rule.targets||1))}</span>
+      <span><b>Daño o efecto</b>${escapeHtml(String(rule.damage||"—"))} ${escapeHtml(rule.damageType||"")}</span>
+      <span><b>Componentes</b>${escapeHtml(rule.components||"—")}</span>
+      <span><b>Duración</b>${escapeHtml(rule.duration||"—")}</span>
+      ${rule.resolution==="spellAttack"?`<span><b>Bonificación de ${escapeHtml(character?.name||"personaje")}</b>${spellAttackBonus23(character)>=0?"+":""}${spellAttackBonus23(character)}</span>`:""}
+      ${rule.resolution==="savingThrow"?`<span><b>CD de ${escapeHtml(character?.name||"personaje")}</b>${spellSaveDC23(character)}</span>`:""}
+    </div>
+  </div>`;
+}
+
+/* ----- ACCIONES ESTRUCTURADAS DE MONSTRUOS ----- */
+function parseDice23(text){
+  const m=String(text||"").match(/(\d+d\d+(?:\s*[+-]\s*\d+)?)/i);
+  return m?m[1].replace(/\s+/g,""):"";
+}
+function monsterActionRule23(attacker,raw){
+  const p=parts21(raw);
+  const name=String(p.name||"Acción");
+  const attackBonus=parseMasterAttackBonus(p.attack);
+  const lower=normalizeSimple(name+" "+p.attack+" "+p.damage);
+  let range=/distancia|arco|ballesta|jabalina|honda/.test(lower)?"A distancia":"Cuerpo a cuerpo";
+  let extra=null;
+  if(normalizeSimple(attacker.name).includes("lobo")&&normalizeSimple(name).includes("mord")){
+    extra={type:"save",ability:"Fuerza",dc:11,onFail:"Derribado"};
+  }
+  return {
+    name,
+    resolution:/[+-]\d+/.test(String(p.attack))?"weaponAttack":"manual",
+    attackBonus,
+    range,
+    targets:1,
+    damage:parseDice23(p.damage)||p.damage||"No registrado",
+    damageType:(String(p.damage).match(/perforante|cortante|contundente|fuego|frío|veneno|necrótico|radiante|fuerza/i)||[""])[0],
+    effect:extra?`Si impacta, además exige salvación de ${extra.ability} CD ${extra.dc}; si falla, queda ${extra.onFail.toLowerCase()}.`:"",
+    extra
+  };
+}
+
+let unified23=null;
+function openMonsterFlow23(encounter,attacker,actions){
+  unified23={kind:"monster",step:1,encounterId:encounter.id,actorId:attacker.id,actions:actions.map(a=>monsterActionRule23(attacker,a)),targetIds:[]};
+  document.querySelector("#guidedOverlayV2").classList.add("active");
+  renderUnifiedMonster23();
+}
+function renderUnifiedMonster23(){
+  const s=unified23,e=encounterById(s.encounterId),a=e.combatants.find(c=>c.id===s.actorId),box=document.querySelector("#guidedContentV2");
+  document.querySelector("#guidedHeaderV2").textContent=a.name;
+  if(s.step===1){
+    box.innerHTML=`<h3>Elige acción</h3><div class="guided-grid">${s.actions.map((r,i)=>`
+      <button class="guided-choice" data-ma23="${i}">
+        <b>${escapeHtml(r.name)}</b>
+        <small>Ataque ${r.attackBonus>=0?"+":""}${r.attackBonus} · ${escapeHtml(r.damage)} ${escapeHtml(r.damageType)} · ${escapeHtml(r.range)}</small>
+      </button>`).join("")}</div>`;
+    document.querySelectorAll("[data-ma23]").forEach(b=>b.onclick=()=>{s.action=s.actions[+b.dataset.ma23];s.step=2;renderUnifiedMonster23()});
+    return;
+  }
+  if(s.step===2){
+    box.innerHTML=`${ruleCard23({
+      name:s.action.name,resolution:"spellAttack",range:s.action.range,targets:1,
+      damage:s.action.damage,damageType:s.action.damageType,components:"—",duration:"Instantáneo",
+      effect:s.action.effect||"Ataque de criatura."
+    },{name:a.name,spellAttackBonus:s.action.attackBonus})}
+    <div class="guided-actions"><button class="ghost" id="maBack23">← Atrás</button><button class="primary" id="maTargets23">Elegir objetivo</button></div>`;
+    maBack23.onclick=()=>{s.step=1;renderUnifiedMonster23()};
+    maTargets23.onclick=()=>{s.step=3;renderUnifiedMonster23()};
+    return;
+  }
+  if(s.step===3){
+    const targets=validEncounterTargets(e,a);
+    box.innerHTML=`<h3>Elige objetivo</h3><div class="guided-grid">${targets.map(t=>`
+      <button class="guided-choice" data-mt23="${t.id}"><b>${escapeHtml(t.name)}</b><small>CA ${t.ac} · PG ${t.hp}/${t.maxHp}</small></button>`).join("")}</div>`;
+    document.querySelectorAll("[data-mt23]").forEach(b=>b.onclick=()=>{s.targetIds=[b.dataset.mt23];s.step=4;renderUnifiedMonster23()});
+    return;
+  }
+  const target=e.combatants.find(c=>c.id===s.targetIds[0]);
+  if(s.step===4){
+    box.innerHTML=`<h3>Tirada de ataque</h3><p>Tira 1d20 para ${escapeHtml(a.name)}. Se sumará ${s.action.attackBonus>=0?"+":""}${s.action.attackBonus} contra CA ${target.ac}.</p>
+      <input id="mRoll23" class="guided-number" inputmode="numeric" placeholder="d20">
+      <div class="guided-actions"><button class="ghost" id="mBack23">← Atrás</button><button class="primary" id="mCalc23">Calcular</button></div>`;
+    mBack23.onclick=()=>{s.step=3;renderUnifiedMonster23()};
+    mCalc23.onclick=()=>{
+      const roll=Number(mRoll23.value);if(!Number.isFinite(roll))return alert("Introduce el resultado del d20.");
+      s.roll=roll;s.total=roll+s.action.attackBonus;s.hit=roll===20||(roll!==1&&s.total>=target.ac);s.step=s.hit?5:7;renderUnifiedMonster23();
+    };return;
+  }
+  if(s.step===5){
+    box.innerHTML=`<div class="guided-result success"><strong>${s.total}</strong><p>Impacta contra CA ${target.ac}</p></div>
+      <p>Tira <b>${escapeHtml(s.action.damage)}</b> de daño ${escapeHtml(s.action.damageType)}.</p>
+      <input id="mDmg23" class="guided-number" inputmode="numeric" placeholder="Daño total">
+      <button class="primary wide" id="mApply23">Aplicar daño</button>`;
+    mApply23.onclick=()=>{const d=Number(mDmg23.value);if(!Number.isFinite(d)||d<0)return alert("Introduce el daño.");s.damage=d;s.step=s.action.extra?6:7;renderUnifiedMonster23()};return;
+  }
+  if(s.step===6){
+    box.innerHTML=`<h3>Efecto adicional</h3><p>${escapeHtml(target.name)} debe hacer una salvación de ${s.action.extra.ability} CD ${s.action.extra.dc}.</p>
+      <input id="mSave23" class="guided-number" inputmode="numeric" placeholder="Resultado total">
+      <button class="primary wide" id="mSaveApply23">Resolver</button>`;
+    mSaveApply23.onclick=()=>{const v=Number(mSave23.value);if(!Number.isFinite(v))return alert("Introduce la salvación.");s.extraFailed=v<s.action.extra.dc;s.step=7;renderUnifiedMonster23()};return;
+  }
+  finishUnifiedMonster23();
+}
+function finishUnifiedMonster23(){
+  const s=unified23,e=encounterById(s.encounterId),a=e.combatants.find(c=>c.id===s.actorId),t=e.combatants.find(c=>c.id===s.targetIds[0]),before=t.hp;
+  if(s.hit&&s.damage>0)applyMasterDamage(t,s.damage);
+  if(s.extraFailed)t.conditions=Array.from(new Set([...(t.conditions||[]),s.action.extra.onFail]));
+  if(t.hp<=0)t.conditions=Array.from(new Set([...(t.conditions||[]),t.kind==="character"?"Inconsciente":"Derrotado"]));
+  masterLog(e,s.action.name,`${a.name} ataca a ${t.name}: ${s.roll} ${s.action.attackBonus>=0?"+":""}${s.action.attackBonus} = ${s.total}. ${s.hit?`Impacta y causa ${s.damage||0}.`:"Falla."}`);
+  saveEncounters();
+  monsterResult21={attackerId:a.id,targetId:t.id,actionName:s.action.name,hit:!!s.hit,total:s.total,damage:s.hit?(s.damage||0):0,before};
+  document.querySelector("#guidedOverlayV2").classList.remove("active");unified23=null;flow21.stage="monsterResult";renderFlow21();
+}
+
+/* ----- CONJUROS ESTRUCTURADOS ----- */
+function openSpellFlow23(){
+  const e=f21Encounter(),a=f21Current(),ch=gcharV2(a);
+  const names=[...new Set([...(ch?.cantrips||[]),...(ch?.spells||[])])];
+  unified23={kind:"spell",step:1,encounterId:e.id,actorId:a.id,characterId:ch?.id,spells:names.map(n=>spellRule23(n,ch)),targetIds:[]};
+  document.querySelector("#guidedOverlayV2").classList.add("active");renderUnifiedSpell23();
+}
+function renderUnifiedSpell23(){
+  const s=unified23,e=encounterById(s.encounterId),a=e.combatants.find(c=>c.id===s.actorId),ch=characters.find(c=>c.id===s.characterId),box=document.querySelector("#guidedContentV2");
+  document.querySelector("#guidedHeaderV2").textContent=a.name;
+  if(s.step===1){
+    box.innerHTML=`<h3>Elige conjuro</h3><div class="guided-grid">${s.spells.map((r,i)=>`
+      <button class="guided-choice" data-sp23="${i}"><b>${escapeHtml(r.name)}</b><small>${escapeHtml(resolutionText23(r))} · ${escapeHtml(r.damage)} · ${escapeHtml(String(r.range))}</small></button>`).join("")}</div>`;
+    document.querySelectorAll("[data-sp23]").forEach(b=>b.onclick=()=>{s.spell=s.spells[+b.dataset.sp23];s.step=2;renderUnifiedSpell23()});return;
+  }
+  if(s.step===2){
+    box.innerHTML=`${ruleCard23(s.spell,{...ch,name:a.name})}<div class="guided-actions"><button class="ghost" id="spBack23">← Atrás</button><button class="primary" id="spTarget23">Elegir objetivo${s.spell.area?"s":""}</button></div>`;
+    spBack23.onclick=()=>{s.step=1;renderUnifiedSpell23()};spTarget23.onclick=()=>{s.step=3;renderUnifiedSpell23()};return;
+  }
+  if(s.step===3){
+    const friendly=["players","allies"];
+    const targets=s.spell.resolution==="healing"?e.combatants.filter(t=>t.hp>0&&(friendly.includes(a.team)?friendly.includes(t.team):t.team==="enemies")):validEncounterTargets(e,a);
+    const type=s.spell.area?"checkbox":"radio";
+    box.innerHTML=`<h3>Selecciona objetivo${s.spell.area?"s":""}</h3>${targets.map(t=>`
+      <label class="guided-target-row"><input type="${type}" name="spt23" value="${t.id}"><span><b>${escapeHtml(t.name)}</b><small>CA ${t.ac} · PG ${t.hp}/${t.maxHp}</small></span><span>${teamNameV101c(t.team)}</span></label>`).join("")}
+      <button class="primary wide" id="spContinue23">Continuar</button>`;
+    spContinue23.onclick=()=>{s.targetIds=[...document.querySelectorAll('input[name="spt23"]:checked')].map(x=>x.value);if(!s.targetIds.length)return alert("Selecciona objetivo.");s.step=4;renderUnifiedSpell23()};return;
+  }
+  const target=e.combatants.find(c=>c.id===s.targetIds[0]);
+  if(s.step===4&&s.spell.resolution==="spellAttack"){
+    const bonus=spellAttackBonus23(ch);
+    box.innerHTML=`<h3>Ataque de conjuro</h3><p>Tira 1d20. Bonificación de ${escapeHtml(a.name)}: ${bonus>=0?"+":""}${bonus}. CA de ${escapeHtml(target.name)}: ${target.ac}.</p>
+      <input id="spRoll23" class="guided-number" inputmode="numeric" placeholder="d20"><button class="primary wide" id="spCalc23">Calcular</button>`;
+    spCalc23.onclick=()=>{const r=Number(spRoll23.value);if(!Number.isFinite(r))return alert("Introduce el d20.");s.roll=r;s.total=r+bonus;s.hit=r===20||(r!==1&&s.total>=target.ac);s.step=s.hit?5:7;renderUnifiedSpell23()};return;
+  }
+  if(s.step===4&&s.spell.resolution==="savingThrow"){
+    const dc=spellSaveDC23(ch);
+    box.innerHTML=`<h3>Salvaciones de ${escapeHtml(s.spell.save)}</h3><p>CD de ${escapeHtml(a.name)}: ${dc}.</p>${s.targetIds.map(id=>{const t=e.combatants.find(c=>c.id===id);return`<label class="guided-target-row"><span>${escapeHtml(t.name)}</span><input data-ss23="${id}" inputmode="numeric" placeholder="Total"><span>CD ${dc}</span></label>`}).join("")}<button class="primary wide" id="spSaves23">Continuar</button>`;
+    spSaves23.onclick=()=>{s.saves={};document.querySelectorAll("[data-ss23]").forEach(i=>s.saves[i.dataset.ss23]=Number(i.value));s.step=5;renderUnifiedSpell23()};return;
+  }
+  if(s.step===4){s.step=5;return renderUnifiedSpell23()}
+  if(s.step===5){
+    box.innerHTML=`${ruleCard23(s.spell,{...ch,name:a.name})}<p>Tira <b>${escapeHtml(s.spell.damage)}</b>${s.spell.damageType?` de ${escapeHtml(s.spell.damageType)}`:""} e introduce el total.</p>
+      <input id="spDmg23" class="guided-number" inputmode="numeric" placeholder="${s.spell.resolution==="healing"?"Curación":"Resultado total"}"><button class="primary wide" id="spApply23">Aplicar</button>`;
+    spApply23.onclick=()=>{const v=Number(spDmg23.value||0);if(!Number.isFinite(v)||v<0)return alert("Introduce el resultado.");s.value=v;s.step=7;renderUnifiedSpell23()};return;
+  }
+  finishUnifiedSpell23();
+}
+function finishUnifiedSpell23(){
+  const s=unified23,e=encounterById(s.encounterId),a=e.combatants.find(c=>c.id===s.actorId),ch=characters.find(c=>c.id===s.characterId),results=[];
+  if(s.spell.resolution==="spellAttack"&&!s.hit){
+    const t=e.combatants.find(c=>c.id===s.targetIds[0]);results.push({targetId:t.id,name:t.name,before:t.hp,after:t.hp,amount:0,hit:false,defeated:false,text:"El conjuro falla."});
+  }else if(s.spell.resolution==="pool"){
+    let pool=s.value;for(const t of s.targetIds.map(id=>e.combatants.find(c=>c.id===id)).sort((x,y)=>x.hp-y.hp)){const before=t.hp,aff=pool>=t.hp;if(aff){pool-=t.hp;t.conditions=Array.from(new Set([...(t.conditions||[]),"Dormido"]))}results.push({targetId:t.id,name:t.name,before,after:t.hp,amount:0,hit:aff,defeated:false,text:aff?"Queda dormido.":"No queda afectado."})}
+  }else{
+    for(const id of s.targetIds){
+      const t=e.combatants.find(c=>c.id===id),before=t.hp;
+      if(s.spell.resolution==="healing"){t.hp=Math.min(t.maxHp,t.hp+s.value);results.push({targetId:t.id,name:t.name,before,after:t.hp,amount:t.hp-before,hit:true,defeated:false,text:`Recupera ${t.hp-before} PG.`});continue}
+      let amount=s.value||0,hit=true;
+      if(s.spell.resolution==="spellAttack")hit=!!s.hit;
+      if(s.spell.resolution==="savingThrow"){const passed=Number(s.saves?.[id])>=spellSaveDC23(ch);if(passed)amount=s.spell.saveEffect==="none"?0:Math.floor(amount/2)}
+      if(hit&&amount>0)applyMasterDamage(t,amount);
+      if(t.hp<=0)t.conditions=Array.from(new Set([...(t.conditions||[]),"Derrotado"]));
+      results.push({targetId:t.id,name:t.name,before,after:t.hp,amount:hit?amount:0,hit,defeated:t.hp<=0,text:!hit?"El conjuro falla.":t.hp<=0?"Ha sido derrotado.":`Le quedan ${t.hp} PG.`});
+    }
+  }
+  masterLog(e,s.spell.name,`${a.name} usa ${s.spell.name}. ${results.map(r=>`${r.name}: ${r.text}`).join(" ")}`);saveEncounters();
+  spellResult222={encounterId:e.id,actorId:a.id,spellName:s.spell.name,spell:s.spell,roll:s.roll,total:s.total,value:s.value,results};
+  document.querySelector("#guidedOverlayV2").classList.remove("active");unified23=null;flow21.stage="spellResult222";renderFlow21();
+}
+
+/* Reemplaza la pantalla de turno para eliminar definitivamente los prompts. */
+rTurn21=function(box,e){
+  let a=f21C();if(!a)return;
+  if(Number(a.hp)<=0){nextTurn(e);a=f21C()}
+  const next=nextLivingCombatantV101c(e,1),ch=gcharV2(a),hasSpells=((ch?.spells?.length||0)+(ch?.cantrips?.length||0))>0;
+  const actions=a.kind==="character"
+    ?[["melee","⚔ Cuerpo a cuerpo","Arma equipada, objetivo, d20 y daño"],["ranged","🏹 Ataque a distancia","Arco o arma arrojadiza"],...(hasSpells?[["spell23","✨ Lanzar conjuro","Información completa y resolución guiada"]]:[]),["object","🎒 Usar objeto","Elegir objeto"],["other","⭐ Otra acción","Esquivar, ayudar, correr..."],["finish","⏭ Terminar turno","Pasar al siguiente"]]
+    :[["monster23","⚔ Acción de criatura","Objetivo, d20, daño y efectos"],["other","⭐ Otra acción","Esquivar, ayudar, correr..."],["finish","⏭ Terminar turno","Pasar al siguiente"]];
+  box.innerHTML=f21Card(`${f21Steps(4)}<p class="eyebrow">Ronda ${e.round}</p><h2 class="flow21-title">${escapeHtml(a.name)}</h2><p class="flow21-subtitle">¿Qué hace?</p><div class="flow21-status"><span>Iniciativa ${a.initiative}</span><span>CA ${a.ac}</span><span>PG ${a.hp}/${a.maxHp}</span>${(a.conditions||[]).map(x=>`<span>${escapeHtml(x)}</span>`).join("")}</div><div class="flow21-grid">${actions.map(([id,title,sub])=>`<button class="flow21-choice ${id==="finish"?"selected":""}" data-f23="${id}"><b>${title}</b><small>${sub}</small></button>`).join("")}</div><p class="flow21-mini">Siguiente: ${escapeHtml(next?.name||"Fin")}</p><div class="flow21-actions"><button class="ghost" id="f23view">Ver encuentro</button><button class="danger" id="f23end">Finalizar encuentro</button></div>`);
+  document.querySelectorAll("[data-f23]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.f23;
+    if(id==="finish"){selectedEncounterTargetId=null;nextTurn(e);return renderFlow21()}
+    if(id==="melee")return startAttack22("melee");
+    if(id==="ranged")return startAttack22("ranged");
+    if(id==="spell23")return openSpellFlow23();
+    if(id==="object"||id==="other")return openGV2(id);
+    if(id==="monster23"){const monster=masterMonsterForCombatant(a),acts=monster?.actions||[];if(!acts.length)return openGV2("other");return openMonsterFlow23(e,a,acts)}
+  });
+  f23view.onclick=()=>{saveActiveCombat223();document.body.classList.remove("flow21-mode");activeEncounterId=e.id;renderInitiativeTracker();showView("initiativeTracker")};
+  f23end.onclick=()=>finishEncounter(e);
+};
+
+/* El render del asistente reconoce los dos nuevos flujos. */
+const OLD_RENDER_GV23=renderGV2;
+renderGV2=function(){
+  if(unified23?.kind==="monster")return renderUnifiedMonster23();
+  if(unified23?.kind==="spell")return renderUnifiedSpell23();
+  return OLD_RENDER_GV23();
+};
 
 </script>
 
