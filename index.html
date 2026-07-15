@@ -420,7 +420,7 @@ details{background:#17120d;border:1px solid var(--line);border-radius:13px;paddi
 @media(max-width:650px){.manual-roll-grid{grid-template-columns:1fr}}
 
 
-/* Forja 1.0.1c: consola compacta de combate */
+/* Forja 2.4.1c: consola compacta de combate */
 .combat-console-v101c{
   height:calc(100dvh - 150px);
   min-height:560px;
@@ -620,7 +620,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 }
 
 
-/* Forja 1.0.1d: cierre inteligente e historial */
+/* Forja 2.4.1d: cierre inteligente e historial */
 .encounter-summary-v101d{
   display:grid;
   gap:12px;
@@ -888,7 +888,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 <button class="tab" data-view="maps">Mapas</button>
 <button class="tab" data-view="backup">Copias</button>
 <button class="tab" data-view="dashboard">Panel</button>
-<button class="tab" data-view="finalTools">1.0</button>
+<button class="tab" data-view="finalTools">2.4</button>
   </nav>
 
   <main>
@@ -1284,7 +1284,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
           <button class="secondary" data-go="generators">Abrir generadores</button>
 <button class="secondary" data-go="maps">Abrir atlas</button>
 <button class="secondary" data-go="backup">Copias de seguridad</button>
-<button class="primary" data-go="finalTools">Forja 1.0</button>
+<button class="primary" data-go="finalTools">Forja 2.4</button>
           <button class="secondary" data-go="abilitiesGuide">Determinar características</button>
         </div>
       </div>
@@ -8330,6 +8330,105 @@ renderGV2=function(){
   if(unified23?.kind==="monster")return renderUnifiedMonster23();
   if(unified23?.kind==="spell")return renderUnifiedSpell23();
   return OLD_RENDER_GV23();
+};
+
+
+
+/* =========================================================
+   FORJA 2.4 · CONJUROS HASTA NIVEL DE PERSONAJE 12
+   Niveles de conjuro 0-6
+   ========================================================= */
+const SPELL_DB_24={"salpicadura acida":{"canonical":"Salpicadura ácida","level":0,"school":"Evocación","resolution":"savingThrow","save":"Destreza","saveEffect":"none","range":"18 m","targets":1,"area":false,"damageByLevel":[[1,"1d6"],[5,"2d6"],[11,"3d6"],[17,"4d6"]],"damageType":"ácido","components":"V, S","duration":"Instantáneo","concentration":false,"effect":"El objetivo realiza una salvación de Destreza. Si falla, recibe daño de ácido."},"burla viciosa":{"canonical":"Burla viciosa","level":0,"school":"Encantamiento","resolution":"savingThrow","save":"Sabiduría","saveEffect":"none","range":"18 m","targets":1,"area":false,"damageByLevel":[[1,"1d6"],[5,"2d6"],[11,"3d6"],[17,"4d6"]],"damageType":"psíquico","components":"V","duration":"Instantáneo","concentration":false,"effect":"Si falla la salvación, recibe daño psíquico y tiene desventaja en su siguiente ataque."},"mano de mago":{"canonical":"Mano de mago","level":0,"school":"Conjuración","resolution":"automatic","range":"9 m","targets":"Objeto","area":false,"damage":"Sin daño","damageType":"","components":"V, S","duration":"1 minuto","concentration":false,"effect":"Crea una mano espectral capaz de manipular objetos a distancia."},"luz":{"canonical":"Luz","level":0,"school":"Evocación","resolution":"automatic","range":"Toque","targets":1,"area":false,"damage":"Sin daño","damageType":"","components":"V, M","duration":"1 hora","concentration":false,"effect":"Un objeto emite luz brillante y tenue."},"toque helado":{"canonical":"Toque helado","level":0,"school":"Nigromancia","resolution":"spellAttack","range":"36 m","targets":1,"area":false,"damageByLevel":[[1,"1d10"],[5,"2d10"],[11,"3d10"],[17,"4d10"]],"damageType":"necrótico","components":"V, S","duration":"1 ronda","concentration":false,"effect":"Ataque de conjuro a distancia. El objetivo no puede recuperar PG hasta tu siguiente turno."},"armadura de mago":{"canonical":"Armadura de mago","level":1,"school":"Abjuración","resolution":"automatic","range":"Toque","targets":1,"area":false,"damage":"CA 13 + Destreza","damageType":"","components":"V, S, M","duration":"8 horas","concentration":false,"effect":"La CA base del objetivo pasa a ser 13 + Destreza mientras no lleve armadura."},"bendecir":{"canonical":"Bendecir","level":1,"school":"Encantamiento","resolution":"automatic","range":"9 m","targets":3,"area":true,"damage":"1d4 adicional","damageType":"","components":"V, S, M","duration":"1 minuto","concentration":true,"effect":"Hasta tres criaturas suman 1d4 a ataques y salvaciones."},"escudo":{"canonical":"Escudo","level":1,"school":"Abjuración","resolution":"automatic","range":"Personal","targets":1,"area":false,"damage":"+5 CA","damageType":"","components":"V, S","duration":"1 ronda","concentration":false,"effect":"Reacción: obtienes +5 a la CA hasta el inicio de tu siguiente turno."},"hechizar persona":{"canonical":"Hechizar persona","level":1,"school":"Encantamiento","resolution":"savingThrow","save":"Sabiduría","saveEffect":"none","range":"9 m","targets":1,"area":false,"damage":"Sin daño","damageType":"","components":"V, S","duration":"1 hora","concentration":false,"effect":"Si falla, una criatura humanoide queda hechizada."},"ola atronadora":{"canonical":"Ola atronadora","level":1,"school":"Evocación","resolution":"savingThrow","save":"Constitución","saveEffect":"half","range":"Cubo de 4,5 m","targets":"Área","area":true,"damage":"2d8","damageType":"trueno","components":"V, S","duration":"Instantáneo","concentration":false,"effect":"Empuja a quienes fallen la salvación y causa daño de trueno."},"rayo de bruja":{"canonical":"Rayo de bruja","level":1,"school":"Evocación","resolution":"spellAttack","range":"18 m","targets":1,"area":false,"damage":"1d12","damageType":"relámpago","components":"V, S, M","duration":"1 minuto","concentration":true,"effect":"Ataque de conjuro a distancia. Si impacta, puedes repetir el daño mientras mantengas la conexión."},"arma espiritual":{"canonical":"Arma espiritual","level":2,"school":"Evocación","resolution":"spellAttack","range":"18 m","targets":1,"area":false,"damage":"1d8 + modificador mágico","damageType":"fuerza","components":"V, S","duration":"1 minuto","concentration":false,"effect":"Creas un arma flotante que puede atacar como acción adicional."},"ceguera sordera":{"canonical":"Ceguera/Sordera","level":2,"school":"Transmutación","resolution":"savingThrow","save":"Constitución","saveEffect":"none","range":"36 m","targets":1,"area":false,"damage":"Cegado o ensordecido","damageType":"","components":"V","duration":"1 minuto","concentration":false,"effect":"Si falla, el objetivo queda cegado o ensordecido."},"imagen multiple":{"canonical":"Imagen múltiple","level":2,"school":"Ilusión","resolution":"automatic","range":"Personal","targets":1,"area":false,"damage":"Sin daño","damageType":"","components":"V, S","duration":"1 minuto","concentration":false,"effect":"Tres duplicados ilusorios dificultan que los ataques te alcancen."},"inmovilizar persona":{"canonical":"Inmovilizar persona","level":2,"school":"Encantamiento","resolution":"savingThrow","save":"Sabiduría","saveEffect":"none","range":"18 m","targets":1,"area":false,"damage":"Paralizado","damageType":"","components":"V, S, M","duration":"1 minuto","concentration":true,"effect":"Si falla, un humanoide queda paralizado."},"paso brumoso":{"canonical":"Paso brumoso","level":2,"school":"Conjuración","resolution":"automatic","range":"Personal","targets":1,"area":false,"damage":"Teletransporte 9 m","damageType":"","components":"V","duration":"Instantáneo","concentration":false,"effect":"Te teletransportas hasta 9 m a un espacio desocupado que puedas ver."},"rayo abrasador":{"canonical":"Rayo abrasador","level":2,"school":"Evocación","resolution":"spellAttack","range":"36 m","targets":3,"area":true,"damage":"2d6 por rayo","damageType":"fuego","components":"V, S","duration":"Instantáneo","concentration":false,"effect":"Creas tres rayos. Haz una tirada de ataque de conjuro por cada uno."},"sugestion":{"canonical":"Sugestión","level":2,"school":"Encantamiento","resolution":"savingThrow","save":"Sabiduría","saveEffect":"none","range":"9 m","targets":1,"area":false,"damage":"Sin daño","damageType":"","components":"V, M","duration":"8 horas","concentration":true,"effect":"Si falla, el objetivo sigue una sugerencia razonable."},"animar a los muertos":{"canonical":"Animar a los muertos","level":3,"school":"Nigromancia","resolution":"automatic","range":"3 m","targets":"Cadáver","area":false,"damage":"Invocación","damageType":"","components":"V, S, M","duration":"24 horas","concentration":false,"effect":"Crea o reafirma el control sobre un esqueleto o zombi."},"contraconjuro":{"canonical":"Contraconjuro","level":3,"school":"Abjuración","resolution":"automatic","range":"18 m","targets":1,"area":false,"damage":"Interrumpe conjuro","damageType":"","components":"S","duration":"Instantáneo","concentration":false,"effect":"Reacción para interrumpir el lanzamiento de un conjuro."},"disipar magia":{"canonical":"Disipar magia","level":3,"school":"Abjuración","resolution":"automatic","range":"36 m","targets":1,"area":false,"damage":"Termina efecto mágico","damageType":"","components":"V, S","duration":"Instantáneo","concentration":false,"effect":"Termina conjuros y efectos mágicos."},"miedo":{"canonical":"Miedo","level":3,"school":"Ilusión","resolution":"savingThrow","save":"Sabiduría","saveEffect":"none","range":"Cono de 9 m","targets":"Área","area":true,"damage":"Asustado","damageType":"","components":"V, S, M","duration":"1 minuto","concentration":true,"effect":"Las criaturas que fallen quedan asustadas."},"relampago":{"canonical":"Relámpago","level":3,"school":"Evocación","resolution":"savingThrow","save":"Destreza","saveEffect":"half","range":"Línea de 30 m","targets":"Área","area":true,"damage":"8d6","damageType":"relámpago","components":"V, S, M","duration":"Instantáneo","concentration":false,"effect":"Una línea de relámpago causa daño; mitad si se supera la salvación."},"revivir":{"canonical":"Revivir","level":3,"school":"Nigromancia","resolution":"automatic","range":"Toque","targets":1,"area":false,"damage":"Vuelve con 1 PG","damageType":"","components":"V, S, M","duration":"Instantáneo","concentration":false,"effect":"Devuelve a la vida a una criatura muerta hace menos de un minuto."},"volar":{"canonical":"Volar","level":3,"school":"Transmutación","resolution":"automatic","range":"Toque","targets":1,"area":false,"damage":"Velocidad de vuelo","damageType":"","components":"V, S, M","duration":"10 minutos","concentration":true,"effect":"El objetivo obtiene velocidad de vuelo."},"confusion":{"canonical":"Confusión","level":4,"school":"Encantamiento","resolution":"savingThrow","save":"Sabiduría","saveEffect":"none","range":"27 m; esfera de 3 m","targets":"Área","area":true,"damage":"Comportamiento aleatorio","damageType":"","components":"V, S, M","duration":"1 minuto","concentration":true,"effect":"Las criaturas que fallen actúan de manera confusa."},"destierro":{"canonical":"Destierro","level":4,"school":"Abjuración","resolution":"savingThrow","save":"Carisma","saveEffect":"none","range":"9 m","targets":1,"area":false,"damage":"Desterrado","damageType":"","components":"V, S, M","duration":"1 minuto","concentration":true,"effect":"Si falla, el objetivo es desterrado temporalmente."},"invisibilidad superior":{"canonical":"Invisibilidad superior","level":4,"school":"Ilusión","resolution":"automatic","range":"Toque","targets":1,"area":false,"damage":"Invisible","damageType":"","components":"V, S","duration":"1 minuto","concentration":true,"effect":"El objetivo permanece invisible incluso al atacar o lanzar conjuros."},"polimorfar":{"canonical":"Polimorfar","level":4,"school":"Transmutación","resolution":"savingThrow","save":"Sabiduría","saveEffect":"none","range":"18 m","targets":1,"area":false,"damage":"Transformación","damageType":"","components":"V, S, M","duration":"1 hora","concentration":true,"effect":"Transforma a una criatura en una bestia."},"cono de frio":{"canonical":"Cono de frío","level":5,"school":"Evocación","resolution":"savingThrow","save":"Constitución","saveEffect":"half","range":"Cono de 18 m","targets":"Área","area":true,"damage":"8d8","damageType":"frío","components":"V, S, M","duration":"Instantáneo","concentration":false,"effect":"Un cono de frío causa daño; mitad si se supera la salvación."},"dominar persona":{"canonical":"Dominar persona","level":5,"school":"Encantamiento","resolution":"savingThrow","save":"Sabiduría","saveEffect":"none","range":"18 m","targets":1,"area":false,"damage":"Hechizado y controlado","damageType":"","components":"V, S","duration":"1 minuto","concentration":true,"effect":"Si falla, un humanoide queda hechizado y puede recibir órdenes."},"golpe flamigero":{"canonical":"Golpe flamígero","level":5,"school":"Evocación","resolution":"savingThrow","save":"Destreza","saveEffect":"half","range":"18 m; cilindro de 3 m","targets":"Área","area":true,"damage":"4d6 fuego + 4d6 radiante","damageType":"fuego y radiante","components":"V, S, M","duration":"Instantáneo","concentration":false,"effect":"Una columna de fuego divino causa daño de fuego y radiante."},"muro de fuerza":{"canonical":"Muro de fuerza","level":5,"school":"Evocación","resolution":"automatic","range":"36 m","targets":"Área","area":true,"damage":"Barrera invisible","damageType":"","components":"V, S, M","duration":"10 minutos","concentration":true,"effect":"Crea una barrera invisible inmune al daño físico."},"telequinesis":{"canonical":"Telequinesis","level":5,"school":"Transmutación","resolution":"savingThrow","save":"Fuerza","saveEffect":"none","range":"18 m","targets":1,"area":false,"damage":"Mover o sujetar","damageType":"","components":"V, S","duration":"10 minutos","concentration":true,"effect":"Mueve criaturas u objetos mediante fuerza telequinética."},"cadena de relampagos":{"canonical":"Cadena de relámpagos","level":6,"school":"Evocación","resolution":"savingThrow","save":"Destreza","saveEffect":"half","range":"45 m","targets":4,"area":true,"damage":"10d8","damageType":"relámpago","components":"V, S, M","duration":"Instantáneo","concentration":false,"effect":"Un relámpago salta del objetivo principal a hasta tres criaturas adicionales."},"circulo de muerte":{"canonical":"Círculo de muerte","level":6,"school":"Nigromancia","resolution":"savingThrow","save":"Constitución","saveEffect":"half","range":"45 m; esfera de 18 m","targets":"Área","area":true,"damage":"8d6","damageType":"necrótico","components":"V, S, M","duration":"Instantáneo","concentration":false,"effect":"Una esfera de energía necrótica daña a todas las criaturas del área."},"desintegrar":{"canonical":"Desintegrar","level":6,"school":"Transmutación","resolution":"savingThrow","save":"Destreza","saveEffect":"none","range":"18 m","targets":1,"area":false,"damage":"10d6+40","damageType":"fuerza","components":"V, S, M","duration":"Instantáneo","concentration":false,"effect":"Si falla la salvación, recibe daño de fuerza devastador."},"globo de invulnerabilidad":{"canonical":"Globo de invulnerabilidad","level":6,"school":"Abjuración","resolution":"automatic","range":"Personal; radio de 3 m","targets":"Área","area":true,"damage":"Bloquea conjuros inferiores","damageType":"","components":"V, S, M","duration":"1 minuto","concentration":true,"effect":"Una barrera inmóvil bloquea conjuros de nivel inferior lanzados desde fuera."},"festin de heroes":{"canonical":"Festín de héroes","level":6,"school":"Conjuración","resolution":"automatic","range":"9 m","targets":12,"area":true,"damage":"Beneficios durante 24 horas","damageType":"","components":"V, S, M","duration":"Instantáneo","concentration":false,"effect":"Crea un festín que cura, elimina enfermedades y otorga beneficios duraderos."},"rayo solar":{"canonical":"Rayo solar","level":6,"school":"Evocación","resolution":"savingThrow","save":"Constitución","saveEffect":"half","range":"Línea de 18 m","targets":"Área","area":true,"damage":"6d8","damageType":"radiante","components":"V, S, M","duration":"1 minuto","concentration":true,"effect":"Emites rayos de luz brillante; las criaturas que fallen quedan cegadas temporalmente."},"sugestion de masas":{"canonical":"Sugestión de masas","level":6,"school":"Encantamiento","resolution":"savingThrow","save":"Sabiduría","saveEffect":"none","range":"18 m","targets":12,"area":true,"damage":"Sin daño","damageType":"","components":"V, M","duration":"24 horas","concentration":false,"effect":"Hasta doce criaturas que fallen siguen una sugerencia razonable."}};
+
+Object.entries(SPELL_DB_24).forEach(([key,value])=>{
+  SPELL_DB_23[key]=value;
+});
+
+function availableSpellLevel24(character){
+  const level=Math.max(1,Number(character?.level||1));
+  if(level>=11)return 6;
+  if(level>=9)return 5;
+  if(level>=7)return 4;
+  if(level>=5)return 3;
+  if(level>=3)return 2;
+  return 1;
+}
+
+function spellDatabaseStats24(){
+  const records=Object.values(SPELL_DB_23);
+  const unique=[...new Map(records.map(r=>[normalizeSimple(r.canonical||r.name||""),r])).values()];
+  return {
+    total:unique.length,
+    byLevel:Array.from({length:7},(_,level)=>unique.filter(r=>Number(r.level||0)===level).length)
+  };
+}
+
+const OLD_RULE_CARD_24=ruleCard23;
+ruleCard23=function(rule,character){
+  const base=OLD_RULE_CARD_24(rule,character);
+  const badge='<div class="flow21-status">'
+    +'<span>'+(Number(rule.level||0)===0?'Truco':'Nivel '+rule.level)+'</span>'
+    +'<span>'+escapeHtml(rule.school||'Escuela no registrada')+'</span>'
+    +(rule.concentration?'<span>Concentración</span>':'')
+    +'</div>';
+  return base.replace('<div class="rule-card23">','<div class="rule-card23">'+badge);
+};
+
+const OLD_OPEN_SPELL_24=openSpellFlow23;
+openSpellFlow23=function(){
+  const e=f21Encounter(),a=f21Current(),ch=gcharV2(a);
+  const names=[...new Set([...(ch?.cantrips||[]),...(ch?.spells||[])])];
+  const rules=names.map(n=>spellRule23(n,ch));
+  unified23={
+    kind:'spell',step:1,encounterId:e.id,actorId:a.id,characterId:ch?.id,
+    spells:rules,targetIds:[],maxSpellLevel:availableSpellLevel24(ch)
+  };
+  document.querySelector('#guidedOverlayV2').classList.add('active');
+  renderUnifiedSpell23();
+};
+
+const OLD_RENDER_SPELL_24=renderUnifiedSpell23;
+renderUnifiedSpell23=function(){
+  const s=unified23;
+  if(s?.kind==='spell'&&s.step===1){
+    const e=encounterById(s.encounterId);
+    const a=e.combatants.find(c=>c.id===s.actorId);
+    const ch=characters.find(c=>c.id===s.characterId);
+    const box=document.querySelector('#guidedContentV2');
+    document.querySelector('#guidedHeaderV2').textContent=a.name;
+    box.innerHTML='<h3>Elige conjuro</h3>'
+      +'<p class="guided-subtitle">Nivel de personaje: '+characterLevel23(ch)+' · Acceso teórico hasta conjuros de nivel '+s.maxSpellLevel+'.</p>'
+      +'<div class="guided-grid">'
+      +(s.spells.map((r,i)=>'<button class="guided-choice" data-sp24="'+i+'"><b>'+escapeHtml(r.name)+'</b><small>'
+        +(Number(r.level||0)===0?'Truco':'Nivel '+r.level)+' · '
+        +escapeHtml(resolutionText23(r))+' · '
+        +escapeHtml(String(r.damage||'Sin daño'))+' · '
+        +escapeHtml(String(r.range||'—'))
+        +'</small></button>').join('')||'<p>No hay conjuros registrados en la ficha.</p>')
+      +'</div>';
+    document.querySelectorAll('[data-sp24]').forEach(button=>button.onclick=()=>{
+      s.spell=s.spells[Number(button.dataset.sp24)];
+      s.step=2;
+      renderUnifiedSpell23();
+    });
+    return;
+  }
+  return OLD_RENDER_SPELL_24();
+};
+
+const OLD_RENDER_COMP_24=renderCompendium;
+renderCompendium=function(){
+  OLD_RENDER_COMP_24();
+  const root=document.querySelector('#compendiumContent')||document.querySelector('#compendium');
+  if(!root||document.querySelector('#spellStats24'))return;
+  const stats=spellDatabaseStats24();
+  const panel=document.createElement('div');
+  panel.id='spellStats24';
+  panel.className='active-encounter-banner22';
+  panel.innerHTML='<b>Base estructurada de conjuros 2.4</b>'
+    +'<small>'+stats.total+' conjuros con resolución guiada · Niveles 0 a 6</small>'
+    +'<small>'+stats.byLevel.map((n,i)=>(i===0?'Trucos':'Nivel '+i)+': '+n).join(' · ')+'</small>';
+  root.prepend(panel);
 };
 
 </script>
