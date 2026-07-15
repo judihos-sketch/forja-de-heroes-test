@@ -689,6 +689,26 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 @media(max-width:600px){.guided-grid{grid-template-columns:1fr}}
 
 .flow21-shell{min-height:calc(100dvh - 150px);display:grid;place-items:center;padding:10px}.flow21-card{width:min(720px,100%);background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 18px 50px #0007}.flow21-step{display:flex;gap:6px;margin:8px 0 16px}.flow21-step span{height:6px;flex:1;border-radius:999px;background:var(--line)}.flow21-step span.active{background:var(--gold2)}.flow21-title{margin:.2rem 0 .25rem;font-family:Georgia,serif;font-size:1.7rem}.flow21-subtitle{color:var(--muted);margin:0 0 14px}.flow21-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.flow21-choice{background:#17120d;border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text);text-align:left;min-height:82px}.flow21-choice.selected{border-color:var(--gold2);background:#2a2116}.flow21-choice b,.flow21-choice small{display:block}.flow21-choice small{color:var(--muted);margin-top:5px}.flow21-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}.flow21-actions button{min-height:50px}.flow21-actions .wide{grid-column:1/-1}.flow21-number{width:100%;min-height:76px;font-size:2.2rem;text-align:center;font-weight:900}.flow21-order{display:grid;gap:8px}.flow21-order-item{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:9px;align-items:center;background:#17120d;border:1px solid var(--line);border-radius:12px;padding:10px}.flow21-order-item .rank{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:var(--panel2);color:var(--gold2);font-weight:900}.flow21-status{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 14px}.flow21-status span{border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:.78rem}.flow21-mini{font-size:.82rem;color:var(--muted);text-align:center;margin-top:12px}body.flow21-mode nav,body.flow21-mode .topbar,body.flow21-mode .quickbar,body.flow21-mode .guided-undo{display:none!important}body.flow21-mode main{padding-top:6px;padding-bottom:6px}@media(max-width:560px){.flow21-grid{grid-template-columns:1fr}.flow21-card{padding:14px}.flow21-title{font-size:1.45rem}}
+
+.monster-result21{text-align:center;display:grid;gap:12px}
+.monster-result21 .icon{font-size:3rem}
+.monster-result21 .numbers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.monster-result21 .box{background:#17120d;border:1px solid var(--line);border-radius:12px;padding:11px}
+.monster-result21 .box span,.monster-result21 .box strong{display:block}
+.monster-result21 .box span{color:var(--muted);font-size:.75rem}
+.monster-result21 .box strong{color:var(--gold2);font-size:1.35rem}
+.monster-result21 .hp{background:#17120d;border:1px solid var(--line);border-radius:14px;padding:14px}
+@media(max-width:520px){.monster-result21 .numbers{grid-template-columns:1fr}}
+
+.weapon-slot22,.active-encounter-banner22{background:#17120d;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+.weapon-grid22{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.player-result22{text-align:center;display:grid;gap:12px}
+.player-result22 .numbers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.player-result22 .box{background:#17120d;border:1px solid var(--line);border-radius:12px;padding:11px}
+.player-result22 .box span,.player-result22 .box strong{display:block}
+.player-result22 .box span{color:var(--muted);font-size:.75rem}
+.player-result22 .box strong{color:var(--gold2);font-size:1.35rem}
+@media(max-width:560px){.weapon-grid22,.player-result22 .numbers{grid-template-columns:1fr}}
 </style>
   <title>Forja de Héroes</title>
 </head>
@@ -6844,6 +6864,177 @@ function rInit21(b,e){let c=e.combatants[flow21.initiativeIndex];if(!c){flow21.s
 function rOrder21(b,e){let o=[...e.combatants].sort((a,b)=>(b.initiative??0)-(a.initiative??0)||(b.initiativeBonus||0)-(a.initiativeBonus||0));b.innerHTML=f21Card(`${f21Steps(3)}<p class="eyebrow">Orden de iniciativa</p><h2 class="flow21-title">Todo preparado</h2><p class="flow21-subtitle">Comprueba el orden.</p><div class="flow21-order">${o.map((c,i)=>`<div class="flow21-order-item"><span class="rank">${i+1}</span><span><b>${escapeHtml(c.name)}</b><small>${teamNameV101c(c.team)} · CA ${c.ac} · PG ${c.hp}/${c.maxHp}</small></span><button class="ghost" data-f21edit="${c.id}">${c.initiative}</button></div>`).join("")}</div><div class="flow21-actions"><button class="ghost" id="f21repeat">Repetir</button><button class="primary" id="f21start">Comenzar combate</button></div>`);document.querySelectorAll("[data-f21edit]").forEach(x=>x.onclick=()=>{let c=e.combatants.find(y=>y.id===x.dataset.f21edit),v=Number(prompt(`Iniciativa total de ${c.name}`,c.initiative));if(Number.isFinite(v)){c.initiative=v;saveEncounters();renderFlow21()}});document.querySelector("#f21repeat").onclick=()=>{flow21.stage="initiative";flow21.initiativeIndex=0;e.combatants.forEach(c=>c.initiative=null);renderFlow21()};document.querySelector("#f21start").onclick=()=>{e.combatants=o;e.turnIndex=0;e.round=1;e.status="En curso";e.startedAt=new Date().toISOString();selectedEncounterTargetId=null;saveEncounters();flow21.stage="turn";renderFlow21()}}
 function rTurn21(b,e){let a=f21C();if(!a)return;if(Number(a.hp)<=0){nextTurn(e);a=f21C()}let n=nextLivingCombatantV101c(e,1),ch=gcharV2(a),hasSpells=((ch?.spells?.length||0)+(ch?.cantrips?.length||0))>0,acts=a.kind==="character"?[["attack","⚔ Cuerpo a cuerpo","Arma, enemigo, d20 y daño"],["attack","🏹 Ataque a distancia","Arma, enemigo, d20 y daño"],...(hasSpells?[["spell","✨ Lanzar conjuro","Conjuro, objetivos y efecto"]]:[]),["object","🎒 Usar objeto","Elegir objeto"],["other","⭐ Otra acción","Esquivar, ayudar, correr..."],["finish","⏭ Terminar turno","Pasar al siguiente"]]:[["monster","⚔ Acción de criatura","Ataque o habilidad"],["other","⭐ Otra acción","Esquivar, ayudar, correr..."],["finish","⏭ Terminar turno","Pasar al siguiente"]];b.innerHTML=f21Card(`${f21Steps(4)}<p class="eyebrow">Ronda ${e.round}</p><h2 class="flow21-title">${escapeHtml(a.name)}</h2><p class="flow21-subtitle">¿Qué hace?</p><div class="flow21-status"><span>Iniciativa ${a.initiative}</span><span>CA ${a.ac}</span><span>PG ${a.hp}/${a.maxHp}${a.tempHp?` +${a.tempHp}`:""}</span>${(a.conditions||[]).map(x=>`<span>${escapeHtml(x)}</span>`).join("")}</div><div class="flow21-grid">${acts.map(([id,t,s])=>`<button class="flow21-choice ${id==="finish"?"selected":""}" data-f21act="${id}"><b>${t}</b><small>${s}</small></button>`).join("")}</div><p class="flow21-mini">Siguiente: ${escapeHtml(n?.name||"Fin")}</p><div class="flow21-actions"><button class="ghost" id="f21view">Ver encuentro</button><button class="danger" id="f21end">Finalizar encuentro</button></div>`);document.querySelectorAll("[data-f21act]").forEach(x=>x.onclick=()=>{let id=x.dataset.f21act;if(id==="finish"){selectedEncounterTargetId=null;nextTurn(e);return renderFlow21()}if(id==="attack"||id==="spell"||id==="object"||id==="other")return openGV2(id);if(id==="monster"){let m=masterMonsterForCombatant(a),aa=m?.actions||[];if(!aa.length)return openGV2("other");let pick=Number(prompt("Elige acción:\n"+aa.map((z,i)=>`${i+1}. ${Array.isArray(z)?z[0]:z.name}`).join("\n"),"1"))-1;if(!aa[pick])return;let ts=validEncounterTargets(e,a);if(!ts.length)return alert("No quedan objetivos.");selectedEncounterTargetId=ts[0].id;resolveMonsterActionCompact(e,a.id,pick);renderFlow21()}});document.querySelector("#f21view").onclick=()=>{document.body.classList.remove("flow21-mode");activeEncounterId=e.id;renderInitiativeTracker();showView("initiativeTracker")};document.querySelector("#f21end").onclick=()=>finishEncounter(e)}
 const F21_OLD_CLOSE=closeGV2;closeGV2=function(){F21_OLD_CLOSE();if(flow21.encounterId&&flow21.stage==="turn")renderFlow21()};const F21_OLD_BUILD=renderEncounterBuilder;renderEncounterBuilder=function(){F21_OLD_BUILD();let e=encounterById(activeEncounterId),a=document.querySelector("#encounterBuilderContent .campaign-actions")||document.querySelector("#encounterBuilderContent .generator-controls");if(!e||!a||document.querySelector("#startFlow21Btn"))return;let b=document.createElement("button");b.id="startFlow21Btn";b.className="primary";b.textContent="Iniciar evento 2.1";a.prepend(b);b.onclick=()=>startFlow21FromBuilder(e.id)};startEncounter=function(id){startFlow21FromBuilder(id)};
+
+let monsterResult21=null;
+function parts21(a){return{name:Array.isArray(a)?a[0]:(a?.name||"Ataque"),attack:Array.isArray(a)?a[1]:(a?.attack||""),damage:Array.isArray(a)?a[2]:(a?.damage||"")}}
+function verb21(n){n=String(n||"ataque").toLowerCase();if(n.includes("mord"))return"muerde";if(n.includes("garra"))return"ataca con sus garras";if(n.includes("espada"))return"golpea con su espada";if(n.includes("arco"))return"dispara una flecha";return`usa ${n}`}
+function renderMonsterResult21(box,e){
+  const r=monsterResult21,a=e.combatants.find(c=>c.id===r.attackerId),t=e.combatants.find(c=>c.id===r.targetId),down=t.hp<=0,isPc=t.kind==="character";
+  box.innerHTML=f21Card(`<div class="monster-result21">
+    <div class="icon">${down?(isPc?"💥":"💀"):(r.hit?"⚔️":"🛡️")}</div>
+    <p class="eyebrow">Resultado de la acción</p>
+    <h2 class="flow21-title">${r.hit?`${escapeHtml(a.name)} impacta`:`${escapeHtml(a.name)} falla`}</h2>
+    <p>${r.hit?`${escapeHtml(a.name)} ${escapeHtml(verb21(r.actionName))} a ${escapeHtml(t.name)}.`:`${escapeHtml(a.name)} intenta atacar a ${escapeHtml(t.name)}, pero falla.`}</p>
+    <div class="numbers">
+      <div class="box"><span>Tirada total</span><strong>${r.total??"—"}</strong></div>
+      <div class="box"><span>CA</span><strong>${t.ac}</strong></div>
+      <div class="box"><span>Daño</span><strong>${r.hit?r.damage:0}</strong></div>
+    </div>
+    ${r.hit?`<div class="hp"><b>${escapeHtml(t.name)}</b><br><strong>${r.before} → ${t.hp} PG</strong></div>`:""}
+    ${down?`<div class="guided-result failure"><strong>${isPc?`${escapeHtml(t.name)} cae inconsciente`:`${escapeHtml(t.name)} ha sido derrotado`}</strong></div>`:""}
+    <div class="flow21-actions">
+      <button class="ghost" id="mrLog21">Ver registro</button>
+      <button class="primary" id="mrContinue21">Continuar al siguiente turno</button>
+    </div>
+  </div>`);
+  document.querySelector("#mrLog21").onclick=()=>{document.body.classList.remove("flow21-mode");activeEncounterId=e.id;renderInitiativeTracker();showView("initiativeTracker")};
+  document.querySelector("#mrContinue21").onclick=()=>{monsterResult21=null;selectedEncounterTargetId=null;nextTurn(e);flow21.stage="turn";renderFlow21()};
+}
+function resolveMonsterAction21(e,a,idx,t){
+  const m=masterMonsterForCombatant(a),act=m?.actions?.[idx];if(!act||!t)return;
+  const p=parts21(act),bonus=parseMasterAttackBonus(p.attack),before=t.hp;
+  let die,total,hit=false,crit=false,damage=0;
+  if(/[+-]\d+/.test(String(p.attack))){
+    if(e.rollMode==="automatic"){die=Math.floor(Math.random()*20)+1}else{die=askNumericRoll(`${a.name} usa ${p.name} contra ${t.name}.\nIntroduce el d20 físico.\nBonificador: ${bonus>=0?"+":""}${bonus}`,"10");if(die===null)return}
+    total=die+bonus;crit=die===20;hit=crit||(die!==1&&total>=t.ac);
+    if(hit){
+      if(e.rollMode==="automatic")damage=rollMasterDamage(p.damage,crit).total;
+      else{damage=askNumericRoll(`${p.name} impacta.\nTira ${p.damage||"el daño indicado"} e introduce el daño total.`,"1");if(damage===null)return}
+      applyMasterDamage(t,damage);
+      if(t.hp<=0)t.conditions=Array.from(new Set([...(t.conditions||[]),t.kind==="character"?"Inconsciente":"Derrotado"]));
+    }
+    masterLog(e,p.name,`${a.name} ataca a ${t.name}: ${die} ${bonus>=0?"+":""}${bonus} = ${total}. ${hit?`Impacta y causa ${damage} de daño. ${t.name}: ${before} → ${t.hp} PG.`:"Falla."}`);
+    saveEncounters();monsterResult21={attackerId:a.id,targetId:t.id,actionName:p.name,hit,total,damage,before};flow21.stage="monsterResult";renderFlow21();return;
+  }
+  selectedEncounterTargetId=t.id;resolveMonsterActionCompact(e,a.id,idx);
+  monsterResult21={attackerId:a.id,targetId:t.id,actionName:p.name,hit:t.hp<before,total:"Efecto",damage:Math.max(0,before-t.hp),before};
+  flow21.stage="monsterResult";renderFlow21();
+}
+const OLD_RF21=renderFlow21;
+renderFlow21=function(){const box=document.querySelector("#combatFlow21Content"),e=f21Encounter();if(flow21.stage==="monsterResult")return renderMonsterResult21(box,e);return OLD_RF21()}
+showMonsterActionPicker21=function(e,a,actions){
+  const box=document.querySelector("#combatFlow21Content");
+  box.innerHTML=f21Card(`<p class="eyebrow">${escapeHtml(a.name)}</p><h2 class="flow21-title">Elige acción</h2><div class="flow21-grid">${actions.map((x,i)=>{const p=parts21(x);return`<button class="flow21-choice" data-ma21="${i}"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.attack)} ${p.damage?`· ${escapeHtml(p.damage)}`:""}</small></button>`}).join("")}</div><div class="flow21-actions"><button class="ghost wide" id="backTurn21">← Volver</button></div>`);
+  document.querySelectorAll("[data-ma21]").forEach(b=>b.onclick=()=>showMonsterTarget21(e,a,actions,+b.dataset.ma21));
+  document.querySelector("#backTurn21").onclick=()=>renderFlow21();
+}
+function showMonsterTarget21(e,a,actions,idx){
+  const ts=livingTargets21(e,a),box=document.querySelector("#combatFlow21Content"),p=parts21(actions[idx]);
+  box.innerHTML=f21Card(`<p class="eyebrow">${escapeHtml(a.name)} · ${escapeHtml(p.name)}</p><h2 class="flow21-title">Elige objetivo</h2><div class="flow21-grid">${ts.map(t=>`<button class="flow21-choice" data-mt21="${t.id}"><b>${escapeHtml(t.name)}</b><small>CA ${t.ac} · PG ${t.hp}/${t.maxHp}</small></button>`).join("")}</div><div class="flow21-actions"><button class="ghost wide" id="backAction21">← Volver</button></div>`);
+  document.querySelectorAll("[data-mt21]").forEach(b=>b.onclick=()=>resolveMonsterAction21(e,a,idx,e.combatants.find(c=>c.id===b.dataset.mt21)));
+  document.querySelector("#backAction21").onclick=()=>showMonsterActionPicker21(e,a,actions);
+}
+
+const ACTIVE_ENCOUNTER_22_KEY="forja_active_encounter_22";
+let playerResult22=null;
+
+function ensureWeapons22(c){
+  if(!c.meleeWeapon)c.meleeWeapon={name:c.weapon||"Daga",attackBonus:Number(c.attackBonus||0),damage:c.weaponDamage||"1d4",damageType:"perforante",thrown:false,range:"6/18 m"};
+  if(!c.rangedWeapon)c.rangedWeapon={name:"Arco corto",attackBonus:Number(c.attackBonus||0),damage:"1d6",damageType:"perforante",range:"24/96 m",ammunition:20};
+}
+characters.forEach(ensureWeapons22);
+
+const OLD_ENSURE22=ensureCharacterV17;
+ensureCharacterV17=function(c){OLD_ENSURE22(c);ensureWeapons22(c)};
+
+function weaponChoices22(c,mode){
+  ensureWeapons22(c);
+  if(mode==="melee")return [{...c.meleeWeapon,display:c.meleeWeapon.name,mode:"melee"}];
+  const list=[];
+  if(c.rangedWeapon?.name)list.push({...c.rangedWeapon,display:c.rangedWeapon.name,mode:"ranged"});
+  if(c.meleeWeapon?.thrown)list.push({...c.meleeWeapon,display:`Lanzar ${c.meleeWeapon.name}`,mode:"thrown"});
+  return list;
+}
+
+/* Editor simple de dos armas en la ficha */
+const OLD_SHEET22=renderCharacterSheet;
+renderCharacterSheet=function(c){
+  OLD_SHEET22(c);ensureWeapons22(c);
+  const root=document.querySelector("#characterSheetContent")||document.querySelector("#characterPlayContent");
+  if(!root||document.querySelector("#weapons22"))return;
+  const sec=document.createElement("section");sec.id="weapons22";sec.className="character-section";
+  sec.innerHTML=`<h3>Armas equipadas</h3>
+  <div class="weapon-slot22"><h4>Cuerpo a cuerpo</h4><div class="weapon-grid22">
+  <label>Nombre<input id="mN22" value="${escapeHtml(c.meleeWeapon.name)}"></label>
+  <label>Bonificador<input id="mB22" type="number" value="${c.meleeWeapon.attackBonus}"></label>
+  <label>Daño<input id="mD22" value="${escapeHtml(c.meleeWeapon.damage)}"></label>
+  <label>Tipo<input id="mT22" value="${escapeHtml(c.meleeWeapon.damageType||"")}"></label>
+  <label><input id="mThrown22" type="checkbox" ${c.meleeWeapon.thrown?"checked":""}> Arrojadiza</label>
+  <label>Alcance<input id="mR22" value="${escapeHtml(c.meleeWeapon.range||"6/18 m")}"></label>
+  </div></div>
+  <div class="weapon-slot22"><h4>A distancia</h4><div class="weapon-grid22">
+  <label>Nombre<input id="rN22" value="${escapeHtml(c.rangedWeapon.name)}"></label>
+  <label>Bonificador<input id="rB22" type="number" value="${c.rangedWeapon.attackBonus}"></label>
+  <label>Daño<input id="rD22" value="${escapeHtml(c.rangedWeapon.damage)}"></label>
+  <label>Tipo<input id="rT22" value="${escapeHtml(c.rangedWeapon.damageType||"")}"></label>
+  <label>Alcance<input id="rR22" value="${escapeHtml(c.rangedWeapon.range||"24/96 m")}"></label>
+  <label>Munición<input id="rA22" type="number" min="0" value="${c.rangedWeapon.ammunition??20}"></label>
+  </div></div><button class="primary" id="saveW22">Guardar armas</button>`;
+  root.appendChild(sec);
+  document.querySelector("#saveW22").onclick=()=>{
+    c.meleeWeapon={name:mN22.value||"Arma",attackBonus:Number(mB22.value||0),damage:mD22.value||"1d4",damageType:mT22.value,thrown:mThrown22.checked,range:mR22.value};
+    c.rangedWeapon={name:rN22.value||"Arco corto",attackBonus:Number(rB22.value||0),damage:rD22.value||"1d6",damageType:rT22.value,range:rR22.value,ammunition:Math.max(0,Number(rA22.value||0))};
+    save();alert("Armas guardadas.");
+  };
+};
+
+function startAttack22(mode){
+  const actor=f21Current(),ch=gcharV2(actor),weapons=weaponChoices22(ch,mode);
+  if(!weapons.length)return alert("No hay armas disponibles.");
+  guidedStateV2={type:"attack22",step:1,mode,weapons,targetIds:[]};
+  document.querySelector("#guidedOverlayV2").classList.add("active");renderAttack22();
+}
+function renderAttack22(){
+  const s=guidedStateV2,e=f21Encounter(),a=f21Current(),box=document.querySelector("#guidedContentV2");
+  document.querySelector("#guidedHeaderV2").textContent=a.name;
+  if(s.step===1){
+    box.innerHTML=`<h3>Elige arma</h3><div class="guided-grid">${s.weapons.map((w,i)=>`<button class="guided-choice" data-w22="${i}"><b>${escapeHtml(w.display)}</b><small>Ataque ${w.attackBonus>=0?"+":""}${w.attackBonus} · Daño ${escapeHtml(w.damage)} ${w.range?`· ${escapeHtml(w.range)}`:""}</small></button>`).join("")}</div>`;
+    document.querySelectorAll("[data-w22]").forEach(b=>b.onclick=()=>{s.weapon=s.weapons[+b.dataset.w22];s.step=2;renderAttack22()});return;
+  }
+  if(s.step===2){
+    const ts=validEncounterTargets(e,a);
+    box.innerHTML=`<h3>Elige enemigo</h3><div class="guided-grid">${ts.map(t=>`<button class="guided-choice" data-t22="${t.id}"><b>${escapeHtml(t.name)}</b><small>CA ${t.ac} · PG ${t.hp}/${t.maxHp}</small></button>`).join("")}</div>`;
+    document.querySelectorAll("[data-t22]").forEach(b=>b.onclick=()=>{s.targetIds=[b.dataset.t22];s.step=3;renderAttack22()});return;
+  }
+  const t=e.combatants.find(x=>x.id===s.targetIds[0]);
+  if(s.step===3){
+    box.innerHTML=`<h3>Tirada de ataque</h3><p>Tira 1d20. Se sumará ${s.weapon.attackBonus>=0?"+":""}${s.weapon.attackBonus} contra CA ${t.ac}.</p><input id="roll22" class="guided-number" inputmode="numeric" placeholder="d20"><div class="guided-actions"><button class="ghost" id="b22">← Atrás</button><button class="primary" id="c22">Calcular</button></div>`;
+    b22.onclick=()=>{s.step=2;renderAttack22()};c22.onclick=()=>{s.roll=Number(roll22.value);if(!Number.isFinite(s.roll))return alert("Introduce el d20.");s.total=s.roll+Number(s.weapon.attackBonus||0);s.hit=s.roll===20||(s.roll!==1&&s.total>=t.ac);s.step=4;renderAttack22()};return;
+  }
+  if(!s.hit){
+    box.innerHTML=`<div class="guided-result failure"><strong>${s.total}</strong><p>Falla contra CA ${t.ac}</p></div><button class="primary wide" id="fm22">Registrar fallo</button>`;
+    fm22.onclick=()=>finishAttack22(0);return;
+  }
+  box.innerHTML=`<div class="guided-result success"><strong>${s.total}</strong><p>Impacta</p></div><p>Tira ${escapeHtml(s.weapon.damage)}.</p><input id="dmg22" class="guided-number" inputmode="numeric" placeholder="Daño"><button class="primary wide" id="fd22">Aplicar daño</button>`;
+  fd22.onclick=()=>{const d=Number(dmg22.value);if(!Number.isFinite(d))return alert("Introduce el daño.");finishAttack22(d)};
+}
+function finishAttack22(d){
+  const e=f21Encounter(),s=guidedStateV2,a=f21Current(),t=e.combatants.find(x=>x.id===s.targetIds[0]),before=t.hp;
+  if(d>0)applyMasterDamage(t,d);
+  if(s.mode==="ranged"&&s.weapon.mode==="ranged"){const ch=gcharV2(a);if(ch.rangedWeapon.ammunition>0)ch.rangedWeapon.ammunition--;save()}
+  if(t.hp<=0)t.conditions=Array.from(new Set([...(t.conditions||[]),"Derrotado"]));
+  masterLog(e,s.weapon.display,`${a.name} ataca a ${t.name}: ${s.total}. ${s.hit?`Impacta y causa ${d}. ${before} → ${t.hp} PG.`:"Falla."}`);
+  saveEncounters();playerResult22={actorId:a.id,targetId:t.id,weapon:s.weapon.display,hit:s.hit,total:s.total,damage:d,before};closeGV2();flow21.stage="playerResult22";renderFlow21();
+}
+function renderPlayerResult22(box,e){
+  const r=playerResult22,a=e.combatants.find(x=>x.id===r.actorId),t=e.combatants.find(x=>x.id===r.targetId),down=t.hp<=0;
+  box.innerHTML=f21Card(`<div class="player-result22"><div style="font-size:3rem">${down?"💀":(r.hit?"⚔️":"🛡️")}</div><h2 class="flow21-title">${r.hit?`${escapeHtml(a.name)} impacta`:`${escapeHtml(a.name)} falla`}</h2>
+  <div class="numbers"><div class="box"><span>Tirada</span><strong>${r.total}</strong></div><div class="box"><span>CA</span><strong>${t.ac}</strong></div><div class="box"><span>Daño</span><strong>${r.hit?r.damage:0}</strong></div></div>
+  ${r.hit?`<div class="guided-result ${down?"failure":"success"}"><strong>${escapeHtml(t.name)}: ${r.before} → ${t.hp} PG</strong><p>${down?`${escapeHtml(t.name)} ha sido derrotado.`:`Le quedan ${t.hp} puntos de vida.`}</p></div>`:""}
+  <button class="primary wide" id="cont22">Continuar turno</button></div>`);
+  cont22.onclick=()=>{playerResult22=null;flow21.stage="turn";renderFlow21()};
+}
+const OLD_FLOW22=renderFlow21;
+renderFlow21=function(){const box=document.querySelector("#combatFlow21Content"),e=f21Encounter();localStorage.setItem(ACTIVE_ENCOUNTER_22_KEY,JSON.stringify({encounterId:e?.id,stage:flow21.stage,initiativeIndex:flow21.initiativeIndex||0}));if(flow21.stage==="playerResult22")return renderPlayerResult22(box,e);return OLD_FLOW22()}
+const OLD_TURN22=renderTurn21;
+renderTurn21=function(box,e){OLD_TURN22(box,e);document.querySelector('[data-action21="melee"]')?.addEventListener("click",ev=>{ev.stopImmediatePropagation();startAttack22("melee")},true);document.querySelector('[data-action21="ranged"]')?.addEventListener("click",ev=>{ev.stopImmediatePropagation();startAttack22("ranged")},true)}
+
+function resumeBanner22(){
+  let s;try{s=JSON.parse(localStorage.getItem(ACTIVE_ENCOUNTER_22_KEY)||"null")}catch(e){}
+  if(!s)return;const e=encounterById(s.encounterId);if(!e||e.status==="Finalizado")return;
+  ["#home","#encounters"].forEach(sel=>{const v=document.querySelector(sel);if(!v||v.querySelector(".active-encounter-banner22"))return;const b=document.createElement("div");b.className="active-encounter-banner22";b.innerHTML=`<b>Encuentro en curso: ${escapeHtml(e.name)}</b><small>Ronda ${e.round} · Turno de ${escapeHtml(e.combatants[e.turnIndex]?.name||"—")}</small><button class="primary" style="margin-top:8px">Reanudar encuentro</button>`;b.querySelector("button").onclick=()=>{flow21={encounterId:e.id,stage:s.stage||"turn",initiativeIndex:s.initiativeIndex||0,action:null};document.body.classList.add("flow21-mode");showView("combatFlow21");renderFlow21()};v.prepend(b)});
+}
+window.addEventListener("DOMContentLoaded",()=>{characters.forEach(ensureWeapons22);save();resumeBanner22()});
 </script>
 
 <div id="guidedOverlayV2" class="guided-overlay"><div class="guided-sheet">
