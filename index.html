@@ -6865,6 +6865,10 @@ function rOrder21(b,e){let o=[...e.combatants].sort((a,b)=>(b.initiative??0)-(a.
 function rTurn21(b,e){let a=f21C();if(!a)return;if(Number(a.hp)<=0){nextTurn(e);a=f21C()}let n=nextLivingCombatantV101c(e,1),ch=gcharV2(a),hasSpells=((ch?.spells?.length||0)+(ch?.cantrips?.length||0))>0,acts=a.kind==="character"?[["attack","⚔ Cuerpo a cuerpo","Arma, enemigo, d20 y daño"],["attack","🏹 Ataque a distancia","Arma, enemigo, d20 y daño"],...(hasSpells?[["spell","✨ Lanzar conjuro","Conjuro, objetivos y efecto"]]:[]),["object","🎒 Usar objeto","Elegir objeto"],["other","⭐ Otra acción","Esquivar, ayudar, correr..."],["finish","⏭ Terminar turno","Pasar al siguiente"]]:[["monster","⚔ Acción de criatura","Ataque o habilidad"],["other","⭐ Otra acción","Esquivar, ayudar, correr..."],["finish","⏭ Terminar turno","Pasar al siguiente"]];b.innerHTML=f21Card(`${f21Steps(4)}<p class="eyebrow">Ronda ${e.round}</p><h2 class="flow21-title">${escapeHtml(a.name)}</h2><p class="flow21-subtitle">¿Qué hace?</p><div class="flow21-status"><span>Iniciativa ${a.initiative}</span><span>CA ${a.ac}</span><span>PG ${a.hp}/${a.maxHp}${a.tempHp?` +${a.tempHp}`:""}</span>${(a.conditions||[]).map(x=>`<span>${escapeHtml(x)}</span>`).join("")}</div><div class="flow21-grid">${acts.map(([id,t,s])=>`<button class="flow21-choice ${id==="finish"?"selected":""}" data-f21act="${id}"><b>${t}</b><small>${s}</small></button>`).join("")}</div><p class="flow21-mini">Siguiente: ${escapeHtml(n?.name||"Fin")}</p><div class="flow21-actions"><button class="ghost" id="f21view">Ver encuentro</button><button class="danger" id="f21end">Finalizar encuentro</button></div>`);document.querySelectorAll("[data-f21act]").forEach(x=>x.onclick=()=>{let id=x.dataset.f21act;if(id==="finish"){selectedEncounterTargetId=null;nextTurn(e);return renderFlow21()}if(id==="attack"||id==="spell"||id==="object"||id==="other")return openGV2(id);if(id==="monster"){let m=masterMonsterForCombatant(a),aa=m?.actions||[];if(!aa.length)return openGV2("other");let pick=Number(prompt("Elige acción:\n"+aa.map((z,i)=>`${i+1}. ${Array.isArray(z)?z[0]:z.name}`).join("\n"),"1"))-1;if(!aa[pick])return;let ts=validEncounterTargets(e,a);if(!ts.length)return alert("No quedan objetivos.");selectedEncounterTargetId=ts[0].id;resolveMonsterActionCompact(e,a.id,pick);renderFlow21()}});document.querySelector("#f21view").onclick=()=>{document.body.classList.remove("flow21-mode");activeEncounterId=e.id;renderInitiativeTracker();showView("initiativeTracker")};document.querySelector("#f21end").onclick=()=>finishEncounter(e)}
 const F21_OLD_CLOSE=closeGV2;closeGV2=function(){F21_OLD_CLOSE();if(flow21.encounterId&&flow21.stage==="turn")renderFlow21()};const F21_OLD_BUILD=renderEncounterBuilder;renderEncounterBuilder=function(){F21_OLD_BUILD();let e=encounterById(activeEncounterId),a=document.querySelector("#encounterBuilderContent .campaign-actions")||document.querySelector("#encounterBuilderContent .generator-controls");if(!e||!a||document.querySelector("#startFlow21Btn"))return;let b=document.createElement("button");b.id="startFlow21Btn";b.className="primary";b.textContent="Iniciar evento 2.1";a.prepend(b);b.onclick=()=>startFlow21FromBuilder(e.id)};startEncounter=function(id){startFlow21FromBuilder(id)};
 
+function f21Encounter(){return f21E()}
+function f21Current(){return f21C()}
+var renderTurn21=rTurn21;
+var renderCharacterSheet=function(){};
 let monsterResult21=null;
 function parts21(a){return{name:Array.isArray(a)?a[0]:(a?.name||"Ataque"),attack:Array.isArray(a)?a[1]:(a?.attack||""),damage:Array.isArray(a)?a[2]:(a?.damage||"")}}
 function verb21(n){n=String(n||"ataque").toLowerCase();if(n.includes("mord"))return"muerde";if(n.includes("garra"))return"ataca con sus garras";if(n.includes("espada"))return"golpea con su espada";if(n.includes("arco"))return"dispara una flecha";return`usa ${n}`}
@@ -7035,6 +7039,43 @@ function resumeBanner22(){
   ["#home","#encounters"].forEach(sel=>{const v=document.querySelector(sel);if(!v||v.querySelector(".active-encounter-banner22"))return;const b=document.createElement("div");b.className="active-encounter-banner22";b.innerHTML=`<b>Encuentro en curso: ${escapeHtml(e.name)}</b><small>Ronda ${e.round} · Turno de ${escapeHtml(e.combatants[e.turnIndex]?.name||"—")}</small><button class="primary" style="margin-top:8px">Reanudar encuentro</button>`;b.querySelector("button").onclick=()=>{flow21={encounterId:e.id,stage:s.stage||"turn",initiativeIndex:s.initiativeIndex||0,action:null};document.body.classList.add("flow21-mode");showView("combatFlow21");renderFlow21()};v.prepend(b)});
 }
 window.addEventListener("DOMContentLoaded",()=>{characters.forEach(ensureWeapons22);save();resumeBanner22()});
+
+/* =========================================================
+   FORJA 2.2.1 · REPARACIÓN DE COMPATIBILIDAD
+   ========================================================= */
+const FORJA_221_BASE_RTURN=rTurn21;
+rTurn21=function(box,encounter){
+  FORJA_221_BASE_RTURN(box,encounter);
+  const attackButtons=[...document.querySelectorAll('[data-f21act="attack"]')];
+  if(attackButtons[0])attackButtons[0].addEventListener("click",event=>{
+    event.preventDefault();event.stopImmediatePropagation();startAttack22("melee");
+  },true);
+  if(attackButtons[1])attackButtons[1].addEventListener("click",event=>{
+    event.preventDefault();event.stopImmediatePropagation();startAttack22("ranged");
+  },true);
+};
+
+const FORJA_221_OLD_OPEN_SHEET=openSheet;
+openSheet=function(id){
+  FORJA_221_OLD_OPEN_SHEET(id);
+  const character=characters.find(c=>c.id===id);
+  if(character)renderCharacterSheet(character);
+};
+
+/* El botón Combate inferior reanuda el encuentro activo si existe. */
+window.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll('[data-go="initiativeTracker"], [data-go="combatFlow21"]').forEach(button=>{
+    button.addEventListener("click",event=>{
+      let saved=null;
+      try{saved=JSON.parse(localStorage.getItem(ACTIVE_ENCOUNTER_22_KEY)||"null")}catch(e){}
+      const encounter=saved?encounterById(saved.encounterId):null;
+      if(!encounter||encounter.status==="Finalizado")return;
+      event.preventDefault();event.stopImmediatePropagation();
+      flow21={encounterId:encounter.id,stage:saved.stage||"turn",initiativeIndex:saved.initiativeIndex||0,action:null};
+      document.body.classList.add("flow21-mode");showView("combatFlow21");renderFlow21();
+    },true);
+  });
+});
 </script>
 
 <div id="guidedOverlayV2" class="guided-overlay"><div class="guided-sheet">
