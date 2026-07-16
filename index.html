@@ -420,7 +420,7 @@ details{background:#17120d;border:1px solid var(--line);border-radius:13px;paddi
 @media(max-width:650px){.manual-roll-grid{grid-template-columns:1fr}}
 
 
-/* Forja 2.5.1c: consola compacta de combate */
+/* Forja 2.5.1.1c: consola compacta de combate */
 .combat-console-v101c{
   height:calc(100dvh - 150px);
   min-height:560px;
@@ -620,7 +620,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 }
 
 
-/* Forja 2.5.1d: cierre inteligente e historial */
+/* Forja 2.5.1.1d: cierre inteligente e historial */
 .encounter-summary-v101d{
   display:grid;
   gap:12px;
@@ -1300,7 +1300,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
           <button class="secondary" data-go="generators">Abrir generadores</button>
 <button class="secondary" data-go="maps">Abrir atlas</button>
 <button class="secondary" data-go="backup">Copias de seguridad</button>
-<button class="primary" data-go="finalTools">Forja 2.5</button>
+<button class="primary" data-go="finalTools">Forja 2.5.1</button>
           <button class="secondary" data-go="abilitiesGuide">Determinar características</button>
         </div>
       </div>
@@ -8476,13 +8476,60 @@ function activeWeapon25(c){const r=equippedItem25(c,"rightHand"),l=equippedItem2
 function shieldActive25(c){const l=equippedItem25(c,"leftHand"),r=equippedItem25(c,"rightHand"),w=activeWeapon25(c);if(w?.hands===2)return false;return l?.type==="shield"||r?.type==="shield"}
 function applyEquipment25(c){ensureInventory25(c);ensureBaseAbilities25(c);const t={...c.baseAbilities25};c.inventory25.forEach(i=>{if(i.equippedSlot)Object.entries(i.bonuses||{}).forEach(([k,v])=>t[k]=Number(t[k]||0)+Number(v||0))});c.strength=t.str;c.dexterity=t.dex;c.constitution=t.con;c.intelligence=t.int;c.wisdom=t.wis;c.charisma=t.cha;const armor=equippedItem25(c,"body");let ac=10+mod25(t.dex);if(armor?.type==="armor")ac=Number(armor.armorBase||10)+(armor.armorDex?mod25(t.dex):0);if(shieldActive25(c))ac+=Number(equippedItem25(c,"leftHand")?.armorBonus||equippedItem25(c,"rightHand")?.armorBonus||0);c.ac=ac;c.armorClass=ac;const w=activeWeapon25(c);if(w){c.weapon=w.name;c.attackBonus=Number(c.proficiencyBonus||2)+mod25(w.ranged?t.dex:t.str)+Number(w.attackBonus||0);c.weaponDamage=w.damage}}
 function addLoot25(c,name,qty=1){ensureInventory25(c);const ex=c.inventory25.find(i=>normalizeSimple(i.name)===normalizeSimple(name)&&i.stackable);if(ex)ex.quantity+=qty;else c.inventory25.push(cloneItem25(name,qty));applyEquipment25(c);save()}
-function renderInventory25(c){ensureInventory25(c);applyEquipment25(c);const root=document.querySelector("#inventory25Content");root.innerHTML=`<article class="encounter-card"><div class="section-title"><div><p class="eyebrow">Inventario y equipamiento</p><h2>${escapeHtml(c.name)}</h2></div><span class="badge">Forja 2.5</span></div><div class="loadout25"><b>Configuración activa: ${c.activeLoadout25==="back"?"Arma de espalda":"Manos"}</b><div class="loadout25-grid"><span><b>Arma activa</b><br>${escapeHtml(activeWeapon25(c)?.name||"Ninguna")}</span><span><b>Escudo activo</b><br>${shieldActive25(c)?"Sí":"No"}</span><span><b>CA actual</b><br>${c.ac}</span></div></div><h3>Ranuras</h3><div class="inventory25-slots">${EQUIP_SLOTS_25.map(([k,l])=>`<div class="inventory25-slot"><b>${l}</b><small>${escapeHtml(equippedItem25(c,k)?.name||"Vacío")}</small></div>`).join("")}</div><div class="flow21-actions"><button class="secondary" id="hands25">Usar manos</button><button class="secondary" id="back25">Usar arma de espalda</button></div><h3>Objetos</h3>${c.inventory25.map(i=>`<div class="inventory25-item"><span><b>${escapeHtml(i.name)}${i.quantity>1?` ×${i.quantity}`:""}</b><small>${escapeHtml(i.description||"")}</small><small>${i.equippedSlot?"Equipado":"Sin equipar"}</small></span><span class="inventory25-actions"><button class="ghost" data-e25="${i.id}">Equipar</button>${i.equippedSlot?`<button class="danger" data-u25="${i.id}">Quitar</button>`:""}</span></div>`).join("")}<h3>Añadir botín</h3><div class="weapon-grid22"><label>Objeto<select id="loot25">${Object.values(ITEM_DB_25).map(i=>`<option>${escapeHtml(i.name)}</option>`).join("")}</select></label><label>Cantidad<input id="qty25" type="number" min="1" value="1"></label></div><button class="primary" id="add25">Añadir</button></article>`;hands25.onclick=()=>{c.activeLoadout25="oneHanded";applyEquipment25(c);save();renderInventory25(c)};back25.onclick=()=>{const b=equippedItem25(c,"back");if(!b||b.type!=="weapon")return alert("No hay arma en la espalda.");c.activeLoadout25="back";applyEquipment25(c);save();renderInventory25(c)};document.querySelectorAll("[data-e25]").forEach(b=>b.onclick=()=>{const i=itemById25(c,b.dataset.e25),opts=EQUIP_SLOTS_25.filter(([s])=>slotCompatible25(i,s)),n=Number(prompt("Elige ranura:\n"+opts.map((x,j)=>`${j+1}. ${x[1]}`).join("\n"),"1")),sel=opts[n-1];if(sel){equipItem25(c,i,sel[0]);renderInventory25(c)}});document.querySelectorAll("[data-u25]").forEach(b=>b.onclick=()=>{unequipItem25(c,itemById25(c,b.dataset.u25));applyEquipment25(c);save();renderInventory25(c)});add25.onclick=()=>{addLoot25(c,loot25.value,Math.max(1,Number(qty25.value||1)));renderInventory25(c)}}
+function renderInventory25(c){ensureInventory25(c);applyEquipment25(c);const root=document.querySelector("#inventory25Content");root.innerHTML=`<article class="encounter-card"><div class="section-title"><div><p class="eyebrow">Inventario y equipamiento</p><h2>${escapeHtml(c.name)}</h2></div><span class="badge">Forja 2.5.1</span></div><div class="loadout25"><b>Configuración activa: ${c.activeLoadout25==="back"?"Arma de espalda":"Manos"}</b><div class="loadout25-grid"><span><b>Arma activa</b><br>${escapeHtml(activeWeapon25(c)?.name||"Ninguna")}</span><span><b>Escudo activo</b><br>${shieldActive25(c)?"Sí":"No"}</span><span><b>CA actual</b><br>${c.ac}</span></div></div><h3>Ranuras</h3><div class="inventory25-slots">${EQUIP_SLOTS_25.map(([k,l])=>`<div class="inventory25-slot"><b>${l}</b><small>${escapeHtml(equippedItem25(c,k)?.name||"Vacío")}</small></div>`).join("")}</div><div class="flow21-actions"><button class="secondary" id="hands25">Usar manos</button><button class="secondary" id="back25">Usar arma de espalda</button></div><h3>Objetos</h3>${c.inventory25.map(i=>`<div class="inventory25-item"><span><b>${escapeHtml(i.name)}${i.quantity>1?` ×${i.quantity}`:""}</b><small>${escapeHtml(i.description||"")}</small><small>${i.equippedSlot?"Equipado":"Sin equipar"}</small></span><span class="inventory25-actions"><button class="ghost" data-e25="${i.id}">Equipar</button>${i.equippedSlot?`<button class="danger" data-u25="${i.id}">Quitar</button>`:""}</span></div>`).join("")}<h3>Añadir botín</h3><div class="weapon-grid22"><label>Objeto<select id="loot25">${Object.values(ITEM_DB_25).map(i=>`<option>${escapeHtml(i.name)}</option>`).join("")}</select></label><label>Cantidad<input id="qty25" type="number" min="1" value="1"></label></div><button class="primary" id="add25">Añadir</button></article>`;hands25.onclick=()=>{c.activeLoadout25="oneHanded";applyEquipment25(c);save();renderInventory25(c)};back25.onclick=()=>{const b=equippedItem25(c,"back");if(!b||b.type!=="weapon")return alert("No hay arma en la espalda.");c.activeLoadout25="back";applyEquipment25(c);save();renderInventory25(c)};document.querySelectorAll("[data-e25]").forEach(b=>b.onclick=()=>{const i=itemById25(c,b.dataset.e25),opts=EQUIP_SLOTS_25.filter(([s])=>slotCompatible25(i,s)),n=Number(prompt("Elige ranura:\n"+opts.map((x,j)=>`${j+1}. ${x[1]}`).join("\n"),"1")),sel=opts[n-1];if(sel){equipItem25(c,i,sel[0]);renderInventory25(c)}});document.querySelectorAll("[data-u25]").forEach(b=>b.onclick=()=>{unequipItem25(c,itemById25(c,b.dataset.u25));applyEquipment25(c);save();renderInventory25(c)});add25.onclick=()=>{addLoot25(c,loot25.value,Math.max(1,Number(qty25.value||1)));renderInventory25(c)}}
 function openInventory25(id){const c=characters.find(x=>x.id===id);if(!c)return;activeCharacterId=id;showView("inventory25");renderInventory25(c)}
 const OLD_SHEET25=renderCharacterSheet;renderCharacterSheet=function(c){OLD_SHEET25(c);ensureInventory25(c);applyEquipment25(c);const root=document.querySelector("#characterSheetContent")||document.querySelector("#characterPlayContent");if(!root||document.querySelector("#openInventory25"))return;const b=document.createElement("button");b.id="openInventory25";b.className="primary";b.textContent="Inventario y equipamiento";b.onclick=()=>openInventory25(c.id);root.prepend(b)}
 function combatWeapons25(c,mode){ensureInventory25(c);applyEquipment25(c);const items=[equippedItem25(c,"rightHand"),equippedItem25(c,"leftHand"),equippedItem25(c,"back")].filter(Boolean),res=[];items.forEach(i=>{if(mode==="melee"&&i.type==="weapon"&&i.melee)res.push({...i,display:i.name,mode:i.equippedSlot==="back"?"back":"hand"});if(mode==="ranged"&&i.type==="weapon"&&(i.ranged||i.thrown))res.push({...i,display:i.thrown?`Lanzar ${i.name}`:i.name,mode:i.equippedSlot==="back"?"back":"hand"})});return res}
 weaponChoices22=function(c,mode){const w=combatWeapons25(c,mode);return w.length?w:(mode==="melee"?[{name:"Ataque desarmado",display:"Ataque desarmado",attackBonus:Number(c.proficiencyBonus||2)+mod25(c.strength),damage:"1",damageType:"contundente",mode:"hand"}]:[])}
 const OLD_FINISH25=finishAttack22;finishAttack22=function(d){const c=gcharV2(f21Current());if(c&&guidedStateV2?.weapon){c.activeLoadout25=guidedStateV2.weapon.mode==="back"?"back":"oneHanded";applyEquipment25(c);save()}return OLD_FINISH25(d)}
 window.addEventListener("DOMContentLoaded",()=>{characters.forEach(c=>{ensureInventory25(c);applyEquipment25(c)});save()});
+
+function attachInventoryButton251(character){
+  if(!character)return;
+  ["#characterSheetContent","#characterPlayContent","#characterDetailContent","#characterViewContent"].forEach(sel=>{
+    const root=document.querySelector(sel);
+    if(!root||root.querySelector(`[data-open-inventory251="${character.id}"]`))return;
+    const b=document.createElement("button");
+    b.className="primary wide";
+    b.dataset.openInventory251=character.id;
+    b.textContent="🎒 Inventario y equipamiento";
+    b.style.margin="12px 0";
+    b.onclick=()=>openInventory25(character.id);
+    root.prepend(b);
+  });
+}
+function attachInventoryButtonsToCards251(){
+  document.querySelectorAll("[data-character-id],[data-open-character],[data-character]").forEach(card=>{
+    const id=card.dataset.characterId||card.dataset.openCharacter||card.dataset.character;
+    const c=characters.find(x=>x.id===id);
+    if(!c||card.querySelector(`[data-open-inventory251="${c.id}"]`))return;
+    const b=document.createElement("button");
+    b.className="ghost";
+    b.dataset.openInventory251=c.id;
+    b.textContent="Inventario";
+    b.onclick=e=>{e.preventDefault();e.stopPropagation();openInventory25(c.id)};
+    card.appendChild(b);
+  });
+}
+if(typeof renderCharacterSheet==="function"){
+  const old251=renderCharacterSheet;
+  renderCharacterSheet=function(c){const r=old251(c);setTimeout(()=>attachInventoryButton251(c),0);return r}
+}
+if(typeof renderCharacters==="function"){
+  const oldChars251=renderCharacters;
+  renderCharacters=function(){const r=oldChars251();setTimeout(attachInventoryButtonsToCards251,0);return r}
+}
+const observer251=new MutationObserver(()=>{
+  const c=characters.find(x=>x.id===window.activeCharacterId);
+  if(c)attachInventoryButton251(c);
+  attachInventoryButtonsToCards251();
+});
+window.addEventListener("DOMContentLoaded",()=>{
+  observer251.observe(document.body,{childList:true,subtree:true});
+  const c=characters.find(x=>x.id===window.activeCharacterId);
+  if(c)attachInventoryButton251(c);
+  attachInventoryButtonsToCards251();
+});
 </script>
 
 <div id="guidedOverlayV2" class="guided-overlay"><div class="guided-sheet">
