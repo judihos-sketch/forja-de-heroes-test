@@ -420,7 +420,7 @@ details{background:#17120d;border:1px solid var(--line);border-radius:13px;paddi
 @media(max-width:650px){.manual-roll-grid{grid-template-columns:1fr}}
 
 
-/* Forja 2.7.1c: consola compacta de combate */
+/* Forja 2.8.1c: consola compacta de combate */
 .combat-console-v101c{
   height:calc(100dvh - 150px);
   min-height:560px;
@@ -620,7 +620,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 }
 
 
-/* Forja 2.7.1d: cierre inteligente e historial */
+/* Forja 2.8.1d: cierre inteligente e historial */
 .encounter-summary-v101d{
   display:grid;
   gap:12px;
@@ -906,7 +906,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 <button class="tab" data-view="maps">Mapas</button>
 <button class="tab" data-view="backup">Copias</button>
 <button class="tab" data-view="dashboard">Panel</button>
-<button class="tab" data-view="finalTools">2.7</button>
+<button class="tab" data-view="finalTools">2.8</button>
   </nav>
 
   <main>
@@ -1311,7 +1311,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
           <button class="secondary" data-go="generators">Abrir generadores</button>
 <button class="secondary" data-go="maps">Abrir atlas</button>
 <button class="secondary" data-go="backup">Copias de seguridad</button>
-<button class="primary" data-go="finalTools">Forja 2.7</button>
+<button class="primary" data-go="finalTools">Forja 2.8</button>
           <button class="secondary" data-go="abilitiesGuide">Determinar características</button>
         </div>
       </div>
@@ -8458,20 +8458,22 @@ renderUnifiedSpell23=function(){
   return OLD_RENDER_SPELL_24();
 };
 
-const OLD_RENDER_COMP_24=renderCompendium;
-renderCompendium=function(){
-  OLD_RENDER_COMP_24();
-  const root=document.querySelector('#compendiumContent')||document.querySelector('#compendium');
-  if(!root||document.querySelector('#spellStats24'))return;
-  const stats=spellDatabaseStats24();
-  const panel=document.createElement('div');
-  panel.id='spellStats24';
-  panel.className='active-encounter-banner22';
-  panel.innerHTML='<b>Base estructurada de conjuros 2.4</b>'
-    +'<small>'+stats.total+' conjuros con resolución guiada · Niveles 0 a 6</small>'
-    +'<small>'+stats.byLevel.map((n,i)=>(i===0?'Trucos':'Nivel '+i)+': '+n).join(' · ')+'</small>';
-  root.prepend(panel);
-};
+const OLD_RENDER_COMP_24=(typeof renderCompendium==="function")?renderCompendium:null;
+if(OLD_RENDER_COMP_24){
+  renderCompendium=function(){
+    OLD_RENDER_COMP_24();
+    const root=document.querySelector('#compendiumContent')||document.querySelector('#compendium');
+    if(!root||document.querySelector('#spellStats24'))return;
+    const stats=spellDatabaseStats24();
+    const panel=document.createElement('div');
+    panel.id='spellStats24';
+    panel.className='active-encounter-banner22';
+    panel.innerHTML='<b>Base estructurada de conjuros 2.4</b>'
+      +'<small>'+stats.total+' conjuros con resolución guiada · Niveles 0 a 6</small>'
+      +'<small>'+stats.byLevel.map((n,i)=>(i===0?'Trucos':'Nivel '+i)+': '+n).join(' · ')+'</small>';
+    root.prepend(panel);
+  };
+}
 
 
 /* FORJA 2.6 · INVENTARIO NATIVO */
@@ -8508,7 +8510,7 @@ function applyEquipment26(c){ensureInventory26(c);const a={...c.baseAbilities26}
 function effect26(i){const p=[];if(i.armorBase)p.push("CA "+i.armorBase+(i.armorDex?" + DES":""));if(i.armorBonus)p.push("CA +"+i.armorBonus);if(i.attackBonus)p.push("Ataque +"+i.attackBonus);if(i.damage)p.push("Daño "+i.damage);if(i.range)p.push("Alcance "+i.range);Object.entries(i.bonuses||{}).forEach(([k,v])=>p.push(k.toUpperCase()+" +"+v));return p.join(" · ")||i.description||"Sin efecto automático"}
 function addItem26(c,name,qty=1){ensureInventory26(c);const ex=c.inventory26.find(i=>i.stackable&&normalizeSimple(i.name)===normalizeSimple(name));if(ex)ex.quantity+=qty;else c.inventory26.push(cloneItem26(name,qty));save()}
 function openInventory26(id){const c=characters.find(x=>x.id===id);if(!c)return;activeId=id;ensureInventory26(c);applyEquipment26(c);showView("inventory26");renderInventory26(c)}
-function renderInventory26(c){ensureInventory26(c);applyEquipment26(c);const root=$("#inventory26Content");const w=activeWeapon26(c);root.innerHTML=`<article class="card"><div class="sheet-header"><div><p class="eyebrow">Inventario y equipamiento</p><h2>${escapeHtml(c.name)}</h2></div><span class="inventory26-badge">Forja 2.7</span></div><div class="inventory26-summary"><b>Configuración activa: ${c.activeLoadout26==="back"?"Arma de espalda":"Manos"}</b><div class="inventory26-summary-grid"><span><b>Arma</b><br>${escapeHtml(w?.name||"Ninguna")}</span><span><b>Escudo</b><br>${shieldActive26(c)?"Activo":"Inactivo"}</span><span><b>CA</b><br>${c.ac}</span><span><b>FUE / DES</b><br>${c.str} / ${c.dex}</span></div></div><div class="card-actions"><button id="useHands26" class="${c.activeLoadout26==="hands"?"primary":"secondary"}">Usar manos</button><button id="useBack26" class="${c.activeLoadout26==="back"?"primary":"secondary"}">Usar espalda</button></div><h3>Ranuras</h3><div class="inventory26-grid">${EQUIP_SLOTS_26.map(([s,l])=>{const i=equipped26(c,s);return`<div class="inventory26-slot"><b>${l}</b><small>${escapeHtml(i?.name||"Vacío")}</small>${i?`<small>${escapeHtml(effect26(i))}</small><button class="danger" data-clear26="${s}">Quitar</button>`:""}</div>`}).join("")}</div><h3>Inventario</h3>${c.inventory26.map(i=>`<div class="inventory26-item"><span><b>${escapeHtml(i.name)}${i.quantity>1?" ×"+i.quantity:""}</b><small>${escapeHtml(effect26(i))}</small><small>${i.equippedSlot?"Equipado":"Guardado"}</small></span><span class="inventory26-actions">${EQUIP_SLOTS_26.some(([s])=>compatible26(i,s))?`<button class="ghost" data-equip26="${i.id}">Equipar</button>`:""}${i.equippedSlot?`<button class="danger" data-unequip26="${i.id}">Quitar</button>`:""}</span></div>`).join("")}<h3>Añadir botín</h3><div class="form-grid"><label>Objeto<select id="lootName26">${Object.values(ITEM_DB_26).map(i=>`<option>${escapeHtml(i.name)}</option>`).join("")}</select></label><label>Cantidad<input id="lootQty26" type="number" min="1" value="1"></label></div><button id="addLoot26" class="primary wide">Añadir al inventario</button><button id="inventory26BackBottom" class="ghost wide">← Volver a la ficha</button></article>`;
+function renderInventory26(c){ensureInventory26(c);applyEquipment26(c);const root=$("#inventory26Content");const w=activeWeapon26(c);root.innerHTML=`<article class="card"><div class="sheet-header"><div><p class="eyebrow">Inventario y equipamiento</p><h2>${escapeHtml(c.name)}</h2></div><span class="inventory26-badge">Forja 2.8</span></div><div class="inventory26-summary"><b>Configuración activa: ${c.activeLoadout26==="back"?"Arma de espalda":"Manos"}</b><div class="inventory26-summary-grid"><span><b>Arma</b><br>${escapeHtml(w?.name||"Ninguna")}</span><span><b>Escudo</b><br>${shieldActive26(c)?"Activo":"Inactivo"}</span><span><b>CA</b><br>${c.ac}</span><span><b>FUE / DES</b><br>${c.str} / ${c.dex}</span></div></div><div class="card-actions"><button id="useHands26" class="${c.activeLoadout26==="hands"?"primary":"secondary"}">Usar manos</button><button id="useBack26" class="${c.activeLoadout26==="back"?"primary":"secondary"}">Usar espalda</button></div><h3>Ranuras</h3><div class="inventory26-grid">${EQUIP_SLOTS_26.map(([s,l])=>{const i=equipped26(c,s);return`<div class="inventory26-slot"><b>${l}</b><small>${escapeHtml(i?.name||"Vacío")}</small>${i?`<small>${escapeHtml(effect26(i))}</small><button class="danger" data-clear26="${s}">Quitar</button>`:""}</div>`}).join("")}</div><h3>Inventario</h3>${c.inventory26.map(i=>`<div class="inventory26-item"><span><b>${escapeHtml(i.name)}${i.quantity>1?" ×"+i.quantity:""}</b><small>${escapeHtml(effect26(i))}</small><small>${i.equippedSlot?"Equipado":"Guardado"}</small></span><span class="inventory26-actions">${EQUIP_SLOTS_26.some(([s])=>compatible26(i,s))?`<button class="ghost" data-equip26="${i.id}">Equipar</button>`:""}${i.equippedSlot?`<button class="danger" data-unequip26="${i.id}">Quitar</button>`:""}</span></div>`).join("")}<h3>Añadir botín</h3><div class="form-grid"><label>Objeto<select id="lootName26">${Object.values(ITEM_DB_26).map(i=>`<option>${escapeHtml(i.name)}</option>`).join("")}</select></label><label>Cantidad<input id="lootQty26" type="number" min="1" value="1"></label></div><button id="addLoot26" class="primary wide">Añadir al inventario</button><button id="inventory26BackBottom" class="ghost wide">← Volver a la ficha</button></article>`;
 $("#useHands26").onclick=()=>{c.activeLoadout26="hands";applyEquipment26(c);save();renderInventory26(c)};$("#useBack26").onclick=()=>{const b=equipped26(c,"back");if(!b||b.type!=="weapon")return alert("Equipa primero un arma en Espalda.");c.activeLoadout26="back";applyEquipment26(c);save();renderInventory26(c)};$$('[data-equip26]').forEach(b=>b.onclick=()=>{const i=item26(c,b.dataset.equip26),opts=EQUIP_SLOTS_26.filter(([s])=>compatible26(i,s));const n=Number(prompt("Elige ranura:\n"+opts.map((x,j)=>(j+1)+". "+x[1]).join("\n"),"1"));if(opts[n-1]){equip26(c,i,opts[n-1][0]);renderInventory26(c)}});$$('[data-unequip26]').forEach(b=>b.onclick=()=>{unequip26(c,item26(c,b.dataset.unequip26));applyEquipment26(c);save();renderInventory26(c)});$$('[data-clear26]').forEach(b=>b.onclick=()=>{unequip26(c,equipped26(c,b.dataset.clear26));applyEquipment26(c);save();renderInventory26(c)});$("#addLoot26").onclick=()=>{addItem26(c,$("#lootName26").value,Math.max(1,Number($("#lootQty26").value||1)));renderInventory26(c)};const back=()=>openSheet(c.id);$("#inventory26BackBottom").onclick=back;$("#inventory26BackTop").onclick=back}
 characters.forEach(c=>{ensureInventory26(c);applyEquipment26(c)});
 const OLD_WEAPON_CHOICES_26=weaponChoices22;
