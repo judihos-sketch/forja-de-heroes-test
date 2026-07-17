@@ -420,7 +420,7 @@ details{background:#17120d;border:1px solid var(--line);border-radius:13px;paddi
 @media(max-width:650px){.manual-roll-grid{grid-template-columns:1fr}}
 
 
-/* Forja 2.8.1c: consola compacta de combate */
+/* Forja 2.9.1c: consola compacta de combate */
 .combat-console-v101c{
   height:calc(100dvh - 150px);
   min-height:560px;
@@ -620,7 +620,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 }
 
 
-/* Forja 2.8.1d: cierre inteligente e historial */
+/* Forja 2.9.1d: cierre inteligente e historial */
 .encounter-summary-v101d{
   display:grid;
   gap:12px;
@@ -906,7 +906,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 <button class="tab" data-view="maps">Mapas</button>
 <button class="tab" data-view="backup">Copias</button>
 <button class="tab" data-view="dashboard">Panel</button>
-<button class="tab" data-view="finalTools">2.8</button>
+<button class="tab" data-view="finalTools">2.9</button>
   </nav>
 
   <main>
@@ -1311,7 +1311,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
           <button class="secondary" data-go="generators">Abrir generadores</button>
 <button class="secondary" data-go="maps">Abrir atlas</button>
 <button class="secondary" data-go="backup">Copias de seguridad</button>
-<button class="primary" data-go="finalTools">Forja 2.8</button>
+<button class="primary" data-go="finalTools">Forja 2.9</button>
           <button class="secondary" data-go="abilitiesGuide">Determinar características</button>
         </div>
       </div>
@@ -8510,7 +8510,7 @@ function applyEquipment26(c){ensureInventory26(c);const a={...c.baseAbilities26}
 function effect26(i){const p=[];if(i.armorBase)p.push("CA "+i.armorBase+(i.armorDex?" + DES":""));if(i.armorBonus)p.push("CA +"+i.armorBonus);if(i.attackBonus)p.push("Ataque +"+i.attackBonus);if(i.damage)p.push("Daño "+i.damage);if(i.range)p.push("Alcance "+i.range);Object.entries(i.bonuses||{}).forEach(([k,v])=>p.push(k.toUpperCase()+" +"+v));return p.join(" · ")||i.description||"Sin efecto automático"}
 function addItem26(c,name,qty=1){ensureInventory26(c);const ex=c.inventory26.find(i=>i.stackable&&normalizeSimple(i.name)===normalizeSimple(name));if(ex)ex.quantity+=qty;else c.inventory26.push(cloneItem26(name,qty));save()}
 function openInventory26(id){const c=characters.find(x=>x.id===id);if(!c)return;activeId=id;ensureInventory26(c);applyEquipment26(c);showView("inventory26");renderInventory26(c)}
-function renderInventory26(c){ensureInventory26(c);applyEquipment26(c);const root=$("#inventory26Content");const w=activeWeapon26(c);root.innerHTML=`<article class="card"><div class="sheet-header"><div><p class="eyebrow">Inventario y equipamiento</p><h2>${escapeHtml(c.name)}</h2></div><span class="inventory26-badge">Forja 2.8</span></div><div class="inventory26-summary"><b>Configuración activa: ${c.activeLoadout26==="back"?"Arma de espalda":"Manos"}</b><div class="inventory26-summary-grid"><span><b>Arma</b><br>${escapeHtml(w?.name||"Ninguna")}</span><span><b>Escudo</b><br>${shieldActive26(c)?"Activo":"Inactivo"}</span><span><b>CA</b><br>${c.ac}</span><span><b>FUE / DES</b><br>${c.str} / ${c.dex}</span></div></div><div class="card-actions"><button id="useHands26" class="${c.activeLoadout26==="hands"?"primary":"secondary"}">Usar manos</button><button id="useBack26" class="${c.activeLoadout26==="back"?"primary":"secondary"}">Usar espalda</button></div><h3>Ranuras</h3><div class="inventory26-grid">${EQUIP_SLOTS_26.map(([s,l])=>{const i=equipped26(c,s);return`<div class="inventory26-slot"><b>${l}</b><small>${escapeHtml(i?.name||"Vacío")}</small>${i?`<small>${escapeHtml(effect26(i))}</small><button class="danger" data-clear26="${s}">Quitar</button>`:""}</div>`}).join("")}</div><h3>Inventario</h3>${c.inventory26.map(i=>`<div class="inventory26-item"><span><b>${escapeHtml(i.name)}${i.quantity>1?" ×"+i.quantity:""}</b><small>${escapeHtml(effect26(i))}</small><small>${i.equippedSlot?"Equipado":"Guardado"}</small></span><span class="inventory26-actions">${EQUIP_SLOTS_26.some(([s])=>compatible26(i,s))?`<button class="ghost" data-equip26="${i.id}">Equipar</button>`:""}${i.equippedSlot?`<button class="danger" data-unequip26="${i.id}">Quitar</button>`:""}</span></div>`).join("")}<h3>Añadir botín</h3><div class="form-grid"><label>Objeto<select id="lootName26">${Object.values(ITEM_DB_26).map(i=>`<option>${escapeHtml(i.name)}</option>`).join("")}</select></label><label>Cantidad<input id="lootQty26" type="number" min="1" value="1"></label></div><button id="addLoot26" class="primary wide">Añadir al inventario</button><button id="inventory26BackBottom" class="ghost wide">← Volver a la ficha</button></article>`;
+function renderInventory26(c){ensureInventory26(c);applyEquipment26(c);const root=$("#inventory26Content");const w=activeWeapon26(c);root.innerHTML=`<article class="card"><div class="sheet-header"><div><p class="eyebrow">Inventario y equipamiento</p><h2>${escapeHtml(c.name)}</h2></div><span class="inventory26-badge">Forja 2.9</span></div><div class="inventory26-summary"><b>Configuración activa: ${c.activeLoadout26==="back"?"Arma de espalda":"Manos"}</b><div class="inventory26-summary-grid"><span><b>Arma</b><br>${escapeHtml(w?.name||"Ninguna")}</span><span><b>Escudo</b><br>${shieldActive26(c)?"Activo":"Inactivo"}</span><span><b>CA</b><br>${c.ac}</span><span><b>FUE / DES</b><br>${c.str} / ${c.dex}</span></div></div><div class="card-actions"><button id="useHands26" class="${c.activeLoadout26==="hands"?"primary":"secondary"}">Usar manos</button><button id="useBack26" class="${c.activeLoadout26==="back"?"primary":"secondary"}">Usar espalda</button></div><h3>Ranuras</h3><div class="inventory26-grid">${EQUIP_SLOTS_26.map(([s,l])=>{const i=equipped26(c,s);return`<div class="inventory26-slot"><b>${l}</b><small>${escapeHtml(i?.name||"Vacío")}</small>${i?`<small>${escapeHtml(effect26(i))}</small><button class="danger" data-clear26="${s}">Quitar</button>`:""}</div>`}).join("")}</div><h3>Inventario</h3>${c.inventory26.map(i=>`<div class="inventory26-item"><span><b>${escapeHtml(i.name)}${i.quantity>1?" ×"+i.quantity:""}</b><small>${escapeHtml(effect26(i))}</small><small>${i.equippedSlot?"Equipado":"Guardado"}</small></span><span class="inventory26-actions">${EQUIP_SLOTS_26.some(([s])=>compatible26(i,s))?`<button class="ghost" data-equip26="${i.id}">Equipar</button>`:""}${i.equippedSlot?`<button class="danger" data-unequip26="${i.id}">Quitar</button>`:""}</span></div>`).join("")}<h3>Añadir botín</h3><div class="form-grid"><label>Objeto<select id="lootName26">${Object.values(ITEM_DB_26).map(i=>`<option>${escapeHtml(i.name)}</option>`).join("")}</select></label><label>Cantidad<input id="lootQty26" type="number" min="1" value="1"></label></div><button id="addLoot26" class="primary wide">Añadir al inventario</button><button id="inventory26BackBottom" class="ghost wide">← Volver a la ficha</button></article>`;
 $("#useHands26").onclick=()=>{c.activeLoadout26="hands";applyEquipment26(c);save();renderInventory26(c)};$("#useBack26").onclick=()=>{const b=equipped26(c,"back");if(!b||b.type!=="weapon")return alert("Equipa primero un arma en Espalda.");c.activeLoadout26="back";applyEquipment26(c);save();renderInventory26(c)};$$('[data-equip26]').forEach(b=>b.onclick=()=>{const i=item26(c,b.dataset.equip26),opts=EQUIP_SLOTS_26.filter(([s])=>compatible26(i,s));const n=Number(prompt("Elige ranura:\n"+opts.map((x,j)=>(j+1)+". "+x[1]).join("\n"),"1"));if(opts[n-1]){equip26(c,i,opts[n-1][0]);renderInventory26(c)}});$$('[data-unequip26]').forEach(b=>b.onclick=()=>{unequip26(c,item26(c,b.dataset.unequip26));applyEquipment26(c);save();renderInventory26(c)});$$('[data-clear26]').forEach(b=>b.onclick=()=>{unequip26(c,equipped26(c,b.dataset.clear26));applyEquipment26(c);save();renderInventory26(c)});$("#addLoot26").onclick=()=>{addItem26(c,$("#lootName26").value,Math.max(1,Number($("#lootQty26").value||1)));renderInventory26(c)};const back=()=>openSheet(c.id);$("#inventory26BackBottom").onclick=back;$("#inventory26BackTop").onclick=back}
 characters.forEach(c=>{ensureInventory26(c);applyEquipment26(c)});
 const OLD_WEAPON_CHOICES_26=weaponChoices22;
@@ -8835,6 +8835,354 @@ function renderInlineInventory27(character){
     applyEquipment26(character);save();openSheet(character.id);
   });
 }
+
+
+
+/* =========================================================
+   FORJA 2.9 · CÁLCULO CENTRALIZADO DE CLASE DE ARMADURA
+   ========================================================= */
+
+/* Completa las categorías de las armaduras ya existentes. */
+if(ITEM_DB_26["armadura de cuero"]){
+  ITEM_DB_26["armadura de cuero"].armorCategory="light";
+}
+if(ITEM_DB_26["cota de malla"]){
+  ITEM_DB_26["cota de malla"].armorCategory="heavy";
+}
+
+/* Armaduras habituales para que todas usen las reglas correctas. */
+Object.assign(ITEM_DB_26,{
+  "armadura acolchada":{
+    name:"Armadura acolchada",type:"armor",slot:"body",
+    armorBase:11,armorCategory:"light",description:"CA 11 + DES."
+  },
+  "armadura de cuero tachonado":{
+    name:"Armadura de cuero tachonado",type:"armor",slot:"body",
+    armorBase:12,armorCategory:"light",description:"CA 12 + DES."
+  },
+  "armadura de pieles":{
+    name:"Armadura de pieles",type:"armor",slot:"body",
+    armorBase:12,armorCategory:"medium",description:"CA 12 + DES (máx. +2)."
+  },
+  "camisa de malla":{
+    name:"Camisa de malla",type:"armor",slot:"body",
+    armorBase:13,armorCategory:"medium",description:"CA 13 + DES (máx. +2)."
+  },
+  "cota de escamas":{
+    name:"Cota de escamas",type:"armor",slot:"body",
+    armorBase:14,armorCategory:"medium",description:"CA 14 + DES (máx. +2)."
+  },
+  "coraza":{
+    name:"Coraza",type:"armor",slot:"body",
+    armorBase:14,armorCategory:"medium",description:"CA 14 + DES (máx. +2)."
+  },
+  "media armadura":{
+    name:"Media armadura",type:"armor",slot:"body",
+    armorBase:15,armorCategory:"medium",description:"CA 15 + DES (máx. +2)."
+  },
+  "cota guarnecida":{
+    name:"Cota guarnecida",type:"armor",slot:"body",
+    armorBase:14,armorCategory:"heavy",description:"CA 14."
+  },
+  "armadura de bandas":{
+    name:"Armadura de bandas",type:"armor",slot:"body",
+    armorBase:17,armorCategory:"heavy",description:"CA 17."
+  },
+  "armadura de placas":{
+    name:"Armadura de placas",type:"armor",slot:"body",
+    armorBase:18,armorCategory:"heavy",description:"CA 18."
+  }
+});
+
+function normalizedClass29(character){
+  return normalizeSimple(character?.className||"");
+}
+function normalizedSubclass29(character){
+  return normalizeSimple(
+    character?.subclassName||
+    character?.subclass||
+    character?.specialization||
+    ""
+  );
+}
+function armorCategory29(armor){
+  if(!armor)return null;
+  if(armor.armorCategory)return armor.armorCategory;
+  const name=normalizeSimple(armor.name||"");
+  const light=["armadura acolchada","armadura de cuero","armadura de cuero tachonado"];
+  const medium=["armadura de pieles","camisa de malla","cota de escamas","coraza","media armadura"];
+  const heavy=["cota guarnecida","cota de malla","armadura de bandas","armadura de placas"];
+  if(light.includes(name))return"light";
+  if(medium.includes(name))return"medium";
+  if(heavy.includes(name))return"heavy";
+  return null;
+}
+
+function armorProficiencyWarning29(character,category){
+  if(!category)return"";
+  const cls=normalizedClass29(character);
+
+  const lightClasses=[
+    "barbaro","bardo","brujo","druida","explorador",
+    "guerrero","paladin","picaro"
+  ];
+  const mediumClasses=[
+    "barbaro","clerigo","druida","explorador","guerrero","paladin"
+  ];
+  const heavyClasses=["guerrero","paladin"];
+
+  if(category==="light"&&!lightClasses.includes(cls)){
+    return"Posible falta de competencia con armadura ligera.";
+  }
+  if(category==="medium"&&!mediumClasses.includes(cls)){
+    return"Posible falta de competencia con armadura media.";
+  }
+  if(category==="heavy"&&!heavyClasses.includes(cls)){
+    return"Posible falta de competencia con armadura pesada.";
+  }
+  return"";
+}
+
+/* Devuelve la fórmula completa, no solo el número. */
+function calculateArmorClass29(character,abilities){
+  const dexMod=mod(abilities.dex);
+  const conMod=mod(abilities.con);
+  const wisMod=mod(abilities.wis);
+  const chaMod=mod(abilities.cha);
+  const armor=equipped26(character,"body");
+  const shield=shieldActive26(character)
+    ?(equipped26(character,"leftHand")||equipped26(character,"rightHand"))
+    :null;
+  const shieldBonus=Number(shield?.armorBonus||0);
+  const cls=normalizedClass29(character);
+  const subclass=normalizedSubclass29(character);
+
+  let baseAC=10+dexMod;
+  let formula=`10 ${fmt(dexMod)} por DES`;
+  let source="Sin armadura";
+  let shieldAllowed=true;
+  let warning="";
+
+  if(armor?.type==="armor"){
+    const category=armorCategory29(armor);
+    const armorBase=Number(armor.armorBase||10);
+
+    if(category==="light"){
+      baseAC=armorBase+dexMod;
+      formula=`${armorBase} ${fmt(dexMod)} por DES`;
+      source=armor.name+" (ligera)";
+    }else if(category==="medium"){
+      const cappedDex=Math.min(2,dexMod);
+      baseAC=armorBase+cappedDex;
+      formula=`${armorBase} ${fmt(cappedDex)} por DES (máx. +2)`;
+      source=armor.name+" (media)";
+    }else if(category==="heavy"){
+      baseAC=armorBase;
+      formula=`${armorBase}; la DES no modifica esta armadura`;
+      source=armor.name+" (pesada)";
+    }else{
+      /* Compatibilidad con objetos personalizados antiguos. */
+      const dexContribution=armor.armorDex?dexMod:0;
+      baseAC=armorBase+dexContribution;
+      formula=`${armorBase}${armor.armorDex?` ${fmt(dexContribution)} por DES`:""}`;
+      source=armor.name;
+    }
+
+    warning=armorProficiencyWarning29(character,category);
+  }else{
+    const alternatives=[
+      {
+        ac:10+dexMod,
+        formula:`10 ${fmt(dexMod)} por DES`,
+        source:"Defensa normal sin armadura",
+        shieldAllowed:true
+      }
+    ];
+
+    if(cls==="barbaro"){
+      alternatives.push({
+        ac:10+dexMod+conMod,
+        formula:`10 ${fmt(dexMod)} por DES ${fmt(conMod)} por CON`,
+        source:"Defensa sin armadura del bárbaro",
+        shieldAllowed:true
+      });
+    }
+
+    if(cls==="monje"){
+      alternatives.push({
+        ac:10+dexMod+wisMod,
+        formula:`10 ${fmt(dexMod)} por DES ${fmt(wisMod)} por SAB`,
+        source:"Defensa sin armadura del monje",
+        shieldAllowed:false
+      });
+    }
+
+    if(
+      cls==="bardo" &&
+      Number(character.level||1)>=3 &&
+      (subclass.includes("danza")||subclass.includes("colegio de la danza"))
+    ){
+      alternatives.push({
+        ac:10+dexMod+chaMod,
+        formula:`10 ${fmt(dexMod)} por DES ${fmt(chaMod)} por CAR`,
+        source:"Defensa sin armadura del Colegio de la Danza",
+        shieldAllowed:false
+      });
+    }
+
+    if(
+      cls==="hechicero" &&
+      Number(character.level||1)>=3 &&
+      (subclass.includes("dracon")||subclass.includes("draconic"))
+    ){
+      alternatives.push({
+        ac:10+dexMod+chaMod,
+        formula:`10 ${fmt(dexMod)} por DES ${fmt(chaMod)} por CAR`,
+        source:"Resistencia dracónica",
+        shieldAllowed:true
+      });
+    }
+
+    /* Las fórmulas alternativas no se suman. Se usa la mejor válida. */
+    const valid=alternatives.map(option=>({
+      ...option,
+      total:option.ac+(option.shieldAllowed?shieldBonus:0)
+    }));
+    valid.sort((a,b)=>b.total-a.total);
+    const selected=valid[0];
+
+    baseAC=selected.ac;
+    formula=selected.formula;
+    source=selected.source;
+    shieldAllowed=selected.shieldAllowed;
+
+    if(shieldBonus&&!shieldAllowed){
+      warning="Esta fórmula de CA no permite usar escudo; el +2 no se aplica.";
+    }
+  }
+
+  const appliedShield=shieldAllowed?shieldBonus:0;
+  const total=baseAC+appliedShield;
+  if(appliedShield){
+    formula+=` +${appliedShield} por escudo`;
+  }
+
+  return{
+    total,
+    baseAC,
+    shieldBonus:appliedShield,
+    source,
+    formula,
+    warning
+  };
+}
+
+/* Sustituye el cálculo simplificado anterior para todos los personajes. */
+applyEquipment26=function(character){
+  ensureInventory26(character);
+
+  const abilities={...character.baseAbilities26};
+  character.inventory26.forEach(item=>{
+    if(!item.equippedSlot)return;
+    Object.entries(item.bonuses||{}).forEach(([key,value])=>{
+      abilities[key]=Number(abilities[key]||0)+Number(value||0);
+    });
+  });
+
+  Object.assign(character,{
+    str:abilities.str,
+    dex:abilities.dex,
+    con:abilities.con,
+    int:abilities.int,
+    wis:abilities.wis,
+    cha:abilities.cha
+  });
+
+  const acResult=calculateArmorClass29(character,abilities);
+  character.ac=acResult.total;
+  character.acCalculation29=acResult;
+
+  const weapon=activeWeapon26(character);
+  if(weapon){
+    const ability=weapon.ranged&&!weapon.thrown
+      ?abilities.dex
+      :abilities.str;
+    character.weapon=weapon.name;
+    character.attackBonus=
+      prof(character.level)+
+      mod(ability)+
+      Number(weapon.attackBonus||0);
+    character.weaponDamage=
+      weapon.damage+" "+
+      fmt(mod(ability))+
+      (weapon.damageType?" "+weapon.damageType:"");
+  }
+};
+
+/* Muestra siempre la fórmula aplicada dentro de la ficha. */
+const OLD_RENDER_INLINE_29=renderInlineInventory27;
+renderInlineInventory27=function(character){
+  applyEquipment26(character);
+  OLD_RENDER_INLINE_29(character);
+
+  const summary=document.querySelector("#inlineInventory27 .inline-summary27");
+  if(!summary||summary.querySelector(".ac-explanation29"))return;
+
+  const result=character.acCalculation29;
+  const box=document.createElement("div");
+  box.className="ac-explanation29";
+  box.style.marginTop="10px";
+  box.style.padding="10px";
+  box.style.border="1px solid var(--line)";
+  box.style.borderRadius="10px";
+  box.innerHTML=`
+    <b>Cálculo de CA: ${escapeHtml(result.source)}</b>
+    <small style="display:block;margin-top:4px">
+      ${escapeHtml(result.formula)} = <strong>${result.total}</strong>
+    </small>
+    ${result.warning
+      ?`<small style="display:block;margin-top:5px;color:var(--gold2)">
+        ${escapeHtml(result.warning)}
+       </small>`
+      :""}
+  `;
+  summary.appendChild(box);
+};
+
+/* También enseña la fórmula durante la creación. */
+const OLD_RENDER_WIZARD_INVENTORY_29=renderWizardInventory27;
+renderWizardInventory27=function(){
+  OLD_RENDER_WIZARD_INVENTORY_29();
+
+  const preview=wizardEquipmentPreview27();
+  const root=document.querySelector("#wizardInventory27 .inline-summary27");
+  if(!root||root.querySelector(".ac-explanation29"))return;
+
+  const result=preview.acCalculation29;
+  if(!result)return;
+
+  const box=document.createElement("div");
+  box.className="ac-explanation29";
+  box.style.marginTop="10px";
+  box.innerHTML=`
+    <b>Cálculo de CA</b>
+    <small style="display:block;margin-top:4px">
+      ${escapeHtml(result.source)}:
+      ${escapeHtml(result.formula)} =
+      <strong>${result.total}</strong>
+    </small>
+  `;
+  root.appendChild(box);
+};
+
+/* Recalcula todos los personajes existentes al cargar la nueva versión. */
+window.addEventListener("DOMContentLoaded",()=>{
+  characters.forEach(character=>{
+    ensureInventory26(character);
+    applyEquipment26(character);
+  });
+  save();
+});
 
 </script>
 
