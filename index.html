@@ -420,7 +420,7 @@ details{background:#17120d;border:1px solid var(--line);border-radius:13px;paddi
 @media(max-width:650px){.manual-roll-grid{grid-template-columns:1fr}}
 
 
-/* Forja 2.6.1c: consola compacta de combate */
+/* Forja 2.7.1c: consola compacta de combate */
 .combat-console-v101c{
   height:calc(100dvh - 150px);
   min-height:560px;
@@ -620,7 +620,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 }
 
 
-/* Forja 2.6.1d: cierre inteligente e historial */
+/* Forja 2.7.1d: cierre inteligente e historial */
 .encounter-summary-v101d{
   display:grid;
   gap:12px;
@@ -864,6 +864,21 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 
 .inventory26-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.inventory26-slot,.inventory26-item,.inventory26-summary{background:#17120d;border:1px solid var(--line);border-radius:14px;padding:12px}.inventory26-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;margin-top:8px}.inventory26-slot b,.inventory26-slot small,.inventory26-item b,.inventory26-item small{display:block}.inventory26-slot small,.inventory26-item small{color:var(--muted);margin-top:4px}.inventory26-actions{display:flex;gap:7px;flex-wrap:wrap}.inventory26-summary{border-color:var(--gold2);margin-bottom:12px}.inventory26-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.inventory26-summary-grid span{background:#120f0b;border:1px solid var(--line);border-radius:10px;padding:9px}.inventory26-badge{display:inline-block;padding:4px 8px;border:1px solid var(--gold2);border-radius:999px;color:var(--gold2);font-weight:700}@media(max-width:620px){.inventory26-grid,.inventory26-summary-grid{grid-template-columns:1fr}}
 
+
+/* FORJA 2.7 · INVENTARIO INTEGRADO */
+.inline-inventory27{display:grid;gap:14px}
+.inline-summary27{background:#17120d;border:1px solid var(--gold2);border-radius:14px;padding:13px}
+.inline-summary27-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:9px}
+.inline-summary27-grid span,.inline-slot27,.inline-item27{background:#120f0b;border:1px solid var(--line);border-radius:11px;padding:10px}
+.inline-slots27{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.inline-slot27 label{margin:0}
+.inline-item27{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin-top:7px}
+.inline-item27 b,.inline-item27 small{display:block}
+.inline-item27 small{color:var(--muted);margin-top:3px}
+.wizard-inventory27{display:grid;gap:12px}
+@media(max-width:620px){
+  .inline-summary27-grid,.inline-slots27{grid-template-columns:1fr}
+}
 </style>
   <title>Forja de Héroes</title>
 </head>
@@ -891,7 +906,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 <button class="tab" data-view="maps">Mapas</button>
 <button class="tab" data-view="backup">Copias</button>
 <button class="tab" data-view="dashboard">Panel</button>
-<button class="tab" data-view="finalTools">2.6</button>
+<button class="tab" data-view="finalTools">2.7</button>
   </nav>
 
   <main>
@@ -913,7 +928,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
 
       <article class="card wizard-card">
         <section class="wizard-step active" data-step="1">
-          <p class="eyebrow">Paso 1 de 9</p>
+          <p class="eyebrow">Paso 1 de 10</p>
           <h3>Identidad</h3>
           <label>Nombre del personaje
             <input id="wName" placeholder="Nayra">
@@ -932,7 +947,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
         </section>
 
         <section class="wizard-step" data-step="2">
-          <p class="eyebrow">Paso 2 de 9</p>
+          <p class="eyebrow">Paso 2 de 10</p>
           <h3>Clase</h3>
           <p class="muted">Elige una clase. Puedes consultar su guía completa antes de continuar.</p>
           <div id="wizardClassGrid" class="wizard-choice-grid"></div>
@@ -940,7 +955,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
         </section>
 
         <section class="wizard-step" data-step="3">
-          <p class="eyebrow">Paso 3 de 9</p>
+          <p class="eyebrow">Paso 3 de 10</p>
           <h3>Trasfondo</h3>
           <p class="muted">El trasfondo concede mejoras de característica, habilidades, herramienta, dote y equipo.</p>
           <div id="wizardBackgroundGrid" class="wizard-choice-grid compact-grid"></div>
@@ -948,14 +963,14 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
         </section>
 
         <section class="wizard-step" data-step="4">
-          <p class="eyebrow">Paso 4 de 9</p>
+          <p class="eyebrow">Paso 4 de 10</p>
           <h3>Especie</h3>
           <p class="muted">La especie determina tamaño, velocidad, sentidos y atributos especiales.</p>
           <div id="wizardSpeciesGrid" class="wizard-choice-grid compact-grid"></div>
           <div id="wizardSpeciesSummary" class="selection-summary"></div>
         </section>
         <section class="wizard-step" data-step="5">
-          <p class="eyebrow">Paso 5 de 9</p>
+          <p class="eyebrow">Paso 5 de 10</p>
           <h3>Características</h3>
           <p class="muted">Elige cómo generar las puntuaciones y distribúyelas según tu personaje.</p>
 
@@ -996,7 +1011,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
         </section>
 
         <section class="wizard-step" data-step="6">
-          <p class="eyebrow">Paso 6 de 9</p>
+          <p class="eyebrow">Paso 6 de 10</p>
           <h3>Competencias y habilidades</h3>
           <div id="wizardProficiencySummary" class="selection-summary"></div>
           <h3>Habilidades automáticas</h3>
@@ -1014,7 +1029,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
         </section>
 
         <section class="wizard-step" data-step="7">
-          <p class="eyebrow">Paso 7 de 8</p>
+          <p class="eyebrow">Paso 7 de 10</p>
           <h3>Equipo y combate</h3>
 
           <div id="wizardEquipmentIntro" class="selection-summary"></div>
@@ -1051,7 +1066,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
         </section>
 
         <section class="wizard-step" data-step="8">
-          <p class="eyebrow">Paso 8 de 9</p>
+          <p class="eyebrow">Paso 8 de 10</p>
           <h3>Dote de origen y magia</h3>
 
           <h3>Dote del trasfondo</h3>
@@ -1085,7 +1100,14 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
         </section>
 
         <section class="wizard-step" data-step="9">
-          <p class="eyebrow">Paso 9 de 9</p>
+          <p class="eyebrow">Paso 9 de 10</p>
+          <h3>Inventario y equipamiento</h3>
+          <p class="muted">Los objetos poseídos no aplican bonificaciones hasta estar equipados en una ranura.</p>
+          <div id="wizardInventory27" class="wizard-inventory27"></div>
+        </section>
+
+        <section class="wizard-step" data-step="10">
+          <p class="eyebrow">Paso 10 de 10</p>
           <h3>Resumen</h3>
           <div id="wizardFinalSummary"></div>
           <button id="wizardCreateCharacter" class="primary wide">Crear personaje</button>
@@ -1289,7 +1311,7 @@ body.table-mode-v101c .combat-actions-v101c button{min-height:72px}
           <button class="secondary" data-go="generators">Abrir generadores</button>
 <button class="secondary" data-go="maps">Abrir atlas</button>
 <button class="secondary" data-go="backup">Copias de seguridad</button>
-<button class="primary" data-go="finalTools">Forja 2.6</button>
+<button class="primary" data-go="finalTools">Forja 2.7</button>
           <button class="secondary" data-go="abilitiesGuide">Determinar características</button>
         </div>
       </div>
@@ -2644,13 +2666,16 @@ function openSheet(id){
       </div>
       ${c.proficientSkills?.length?`<div class="info-block"><h3>Competencias</h3><p><b>Salvaciones:</b> ${(c.savingThrowProficiencies||[]).join(" y ")}</p><p><b>Habilidades:</b> ${c.proficientSkills.join(", ")}</p><p><b>Herramienta:</b> ${escapeHtml(c.toolProficiency||"—")}</p></div>`:""}
       ${c.weapon?`<div class="info-block"><h3>Combate</h3><p><b>${escapeHtml(c.weapon)}</b> · ataque ${fmt(c.attackBonus||0)} · ${escapeHtml(c.weaponDamage||"—")}</p><p><b>Armadura:</b> ${escapeHtml(c.armor||"—")}${c.hasShield?" + escudo":""}</p><p><b>Maestrías:</b> ${(c.weaponMasteries||[]).join(", ")||"Ninguna"}</p></div>`:""}${c.originFeat?`<div class="info-block"><h3>Dotes y magia</h3><p><b>Dote:</b> ${escapeHtml(c.originFeat)}${c.humanFeat?` · ${escapeHtml(c.humanFeat)}`:""}</p>${c.spellcastingAbility?`<p><b>Aptitud:</b> ${c.spellcastingAbility} · CD ${c.spellSaveDC} · ataque ${fmt(c.spellAttackBonus||0)}</p><p><b>Espacios:</b> ${escapeHtml(c.spellSlots||"—")}</p>`:""}${c.cantrips?.length?`<p><b>Trucos:</b> ${c.cantrips.join(", ")}</p>`:""}${c.spells?.length?`<p><b>Conjuros:</b> ${c.spells.join(", ")}</p>`:""}</div>`:""}
-      <div class="info-block"><h3>Inventario y equipamiento</h3><p>Objetos poseídos, ranuras equipadas y configuración activa de combate.</p><button id="openInventory26" class="primary wide">🎒 Abrir inventario y equipamiento</button></div>
+      <div class="info-block">
+        <h3>Inventario y equipamiento</h3>
+        <div id="inlineInventory27"></div>
+      </div>
       <div class="info-block"><h3>Equipo</h3><p>${escapeHtml(c.equipment || "Sin equipo registrado.")}</p></div>
       <div class="info-block"><h3>Historia y personalidad</h3><p>${escapeHtml(c.story || "Todavía sin historia. Incluso las leyendas empiezan como un formulario vacío.")}</p></div>
     </article>`;
   $("#hpMinus").addEventListener("click",()=>changeHP(-1));
   $("#hpPlus").addEventListener("click",()=>changeHP(1));
-  $("#openInventory26")?.addEventListener("click",()=>openInventory26(c.id));
+  renderInlineInventory27(c);
   showView("sheet");
 }
 function changeHP(delta){
@@ -3406,13 +3431,13 @@ $("#exportAll").addEventListener("click",()=>{
 });
 
 
-const WIZARD_STEP_NAMES=["Identidad","Clase","Trasfondo","Especie","Características","Competencias","Equipo","Dote y magia","Resumen"];
+const WIZARD_STEP_NAMES=["Identidad","Clase","Trasfondo","Especie","Características","Competencias","Equipo","Dote y magia","Inventario","Resumen"];
 let wizardStep=1;
 let wizardState={
   name:"",level:1,campaign:"",concept:"",
   className:null,background:null,species:null,
   abilities:{FUE:15,DES:14,CON:13,INT:12,SAB:10,CAR:8},
-  classSkills:[], speciesSkills:[], equipmentPackage:null, armor:null, shield:false, weapon:null, masteries:[], originFeat:null, humanFeat:null, cantrips:[], spells:[], abilityMethod:"standard", pointBuy:{FUE:8,DES:8,CON:8,INT:8,SAB:8,CAR:8}, randomAbilityRolls:[]
+  classSkills:[], speciesSkills:[], equipmentPackage:null, armor:null, shield:false, weapon:null, masteries:[], originFeat:null, humanFeat:null, cantrips:[], spells:[], inventory27:[], equipment27:{}, inventorySignature27:"", activeLoadout27:"hands", abilityMethod:"standard", pointBuy:{FUE:8,DES:8,CON:8,INT:8,SAB:8,CAR:8}, randomAbilityRolls:[]
 };
 
 function initWizard(){
@@ -3425,14 +3450,15 @@ function initWizard(){
 }
 function updateWizardUI(){
   document.querySelectorAll(".wizard-step").forEach(s=>s.classList.toggle("active",Number(s.dataset.step)===wizardStep));
-  document.querySelector("#wizardProgressBar").style.width=`${wizardStep/9*100}%`;
+  document.querySelector("#wizardProgressBar").style.width=`${wizardStep/10*100}%`;
   document.querySelectorAll("#wizardStepLabels span").forEach((s,i)=>s.classList.toggle("active",i< wizardStep));
   document.querySelector("#wizardPrev").style.visibility=wizardStep===1?"hidden":"visible";
-  document.querySelector("#wizardNext").style.display=wizardStep===9?"none":"inline-block";
+  document.querySelector("#wizardNext").style.display=wizardStep===10?"none":"inline-block";
   if(wizardStep===6)renderWizardProficiencies();
   if(wizardStep===7)renderWizardEquipment();
   if(wizardStep===8)renderWizardMagic();
-  if(wizardStep===9)renderWizardFinalSummary();
+  if(wizardStep===9)renderWizardInventory27();
+  if(wizardStep===10)renderWizardFinalSummary();
 }
 function captureWizardIdentity(){
   wizardState.name=document.querySelector("#wName").value.trim();
@@ -3482,13 +3508,16 @@ function wizardCanContinue(){
     if(magic.cantrips>0&&wizardState.cantrips.length!==magic.cantrips){alert(`Debes elegir ${magic.cantrips} trucos.`);return false;}
     if(magic.spells>0&&wizardState.spells.length!==magic.spells){alert(`Debes elegir ${magic.spells} conjuros de nivel 1.`);return false;}
   }
+  if(wizardStep===9){
+    ensureWizardInventory27();
+  }
   return true;
 }
-document.querySelector("#wizardNext")?.addEventListener("click",()=>{if(wizardCanContinue()){wizardStep=Math.min(9,wizardStep+1);updateWizardUI();}});
+document.querySelector("#wizardNext")?.addEventListener("click",()=>{if(wizardCanContinue()){wizardStep=Math.min(10,wizardStep+1);updateWizardUI();}});
 document.querySelector("#wizardPrev")?.addEventListener("click",()=>{wizardStep=Math.max(1,wizardStep-1);updateWizardUI();});
 document.querySelector("#wizardReset")?.addEventListener("click",()=>{
   if(!confirm("¿Reiniciar el asistente?"))return;
-  wizardState={name:"",level:1,campaign:"",concept:"",className:null,background:null,species:null,abilities:{FUE:15,DES:14,CON:13,INT:12,SAB:10,CAR:8},classSkills:[],speciesSkills:[],equipmentPackage:null,armor:null,shield:false,weapon:null,masteries:[],originFeat:null,humanFeat:null,cantrips:[],spells:[],abilityMethod:"standard",pointBuy:{FUE:8,DES:8,CON:8,INT:8,SAB:8,CAR:8},randomAbilityRolls:[]};
+  wizardState={name:"",level:1,campaign:"",concept:"",className:null,background:null,species:null,abilities:{FUE:15,DES:14,CON:13,INT:12,SAB:10,CAR:8},classSkills:[],speciesSkills:[],equipmentPackage:null,armor:null,shield:false,weapon:null,masteries:[],originFeat:null,humanFeat:null,cantrips:[],spells:[],inventory27:[],equipment27:{},inventorySignature27:"",activeLoadout27:"hands",abilityMethod:"standard",pointBuy:{FUE:8,DES:8,CON:8,INT:8,SAB:8,CAR:8},randomAbilityRolls:[]};
   document.querySelector("#wName").value="";
   document.querySelector("#wLevel").value=1;
   document.querySelector("#wCampaign").value="";
@@ -4081,9 +4110,14 @@ document.querySelector("#wizardCreateCharacter")?.addEventListener("click",()=>{
     proficientSkills:wizardAllProficientSkills(),
     savingThrowProficiencies:WIZARD_CLASS_SKILLS[cls].saves,
     toolProficiency:BACKGROUND_DATA_2024[wizardState.background].tool,
+    inventory26:JSON.parse(JSON.stringify(wizardState.inventory27||[])),
+    equipment26:JSON.parse(JSON.stringify(wizardState.equipment27||{})),
+    inventory26Initialized:true,
+    activeLoadout26:wizardState.activeLoadout27||"hands",
+    baseAbilities26:{str:a.FUE,dex:a.DES,con:a.CON,int:a.INT,wis:a.SAB,cha:a.CAR},
     story:`Campaña: ${wizardState.campaign||"Sin campaña"}\n\nConcepto: ${wizardState.concept||"Sin concepto"}`
   };
-  touchCharacterV17(c,"Personaje creado");characters.unshift(c);save();activeId=c.id;openSheet(c.id);
+  ensureInventory26(c);applyEquipment26(c);touchCharacterV17(c,"Personaje creado");characters.unshift(c);save();activeId=c.id;openSheet(c.id);
 });
 window.addEventListener("DOMContentLoaded", initWizard);
 
@@ -8474,11 +8508,332 @@ function applyEquipment26(c){ensureInventory26(c);const a={...c.baseAbilities26}
 function effect26(i){const p=[];if(i.armorBase)p.push("CA "+i.armorBase+(i.armorDex?" + DES":""));if(i.armorBonus)p.push("CA +"+i.armorBonus);if(i.attackBonus)p.push("Ataque +"+i.attackBonus);if(i.damage)p.push("Daño "+i.damage);if(i.range)p.push("Alcance "+i.range);Object.entries(i.bonuses||{}).forEach(([k,v])=>p.push(k.toUpperCase()+" +"+v));return p.join(" · ")||i.description||"Sin efecto automático"}
 function addItem26(c,name,qty=1){ensureInventory26(c);const ex=c.inventory26.find(i=>i.stackable&&normalizeSimple(i.name)===normalizeSimple(name));if(ex)ex.quantity+=qty;else c.inventory26.push(cloneItem26(name,qty));save()}
 function openInventory26(id){const c=characters.find(x=>x.id===id);if(!c)return;activeId=id;ensureInventory26(c);applyEquipment26(c);showView("inventory26");renderInventory26(c)}
-function renderInventory26(c){ensureInventory26(c);applyEquipment26(c);const root=$("#inventory26Content");const w=activeWeapon26(c);root.innerHTML=`<article class="card"><div class="sheet-header"><div><p class="eyebrow">Inventario y equipamiento</p><h2>${escapeHtml(c.name)}</h2></div><span class="inventory26-badge">Forja 2.6</span></div><div class="inventory26-summary"><b>Configuración activa: ${c.activeLoadout26==="back"?"Arma de espalda":"Manos"}</b><div class="inventory26-summary-grid"><span><b>Arma</b><br>${escapeHtml(w?.name||"Ninguna")}</span><span><b>Escudo</b><br>${shieldActive26(c)?"Activo":"Inactivo"}</span><span><b>CA</b><br>${c.ac}</span><span><b>FUE / DES</b><br>${c.str} / ${c.dex}</span></div></div><div class="card-actions"><button id="useHands26" class="${c.activeLoadout26==="hands"?"primary":"secondary"}">Usar manos</button><button id="useBack26" class="${c.activeLoadout26==="back"?"primary":"secondary"}">Usar espalda</button></div><h3>Ranuras</h3><div class="inventory26-grid">${EQUIP_SLOTS_26.map(([s,l])=>{const i=equipped26(c,s);return`<div class="inventory26-slot"><b>${l}</b><small>${escapeHtml(i?.name||"Vacío")}</small>${i?`<small>${escapeHtml(effect26(i))}</small><button class="danger" data-clear26="${s}">Quitar</button>`:""}</div>`}).join("")}</div><h3>Inventario</h3>${c.inventory26.map(i=>`<div class="inventory26-item"><span><b>${escapeHtml(i.name)}${i.quantity>1?" ×"+i.quantity:""}</b><small>${escapeHtml(effect26(i))}</small><small>${i.equippedSlot?"Equipado":"Guardado"}</small></span><span class="inventory26-actions">${EQUIP_SLOTS_26.some(([s])=>compatible26(i,s))?`<button class="ghost" data-equip26="${i.id}">Equipar</button>`:""}${i.equippedSlot?`<button class="danger" data-unequip26="${i.id}">Quitar</button>`:""}</span></div>`).join("")}<h3>Añadir botín</h3><div class="form-grid"><label>Objeto<select id="lootName26">${Object.values(ITEM_DB_26).map(i=>`<option>${escapeHtml(i.name)}</option>`).join("")}</select></label><label>Cantidad<input id="lootQty26" type="number" min="1" value="1"></label></div><button id="addLoot26" class="primary wide">Añadir al inventario</button><button id="inventory26BackBottom" class="ghost wide">← Volver a la ficha</button></article>`;
+function renderInventory26(c){ensureInventory26(c);applyEquipment26(c);const root=$("#inventory26Content");const w=activeWeapon26(c);root.innerHTML=`<article class="card"><div class="sheet-header"><div><p class="eyebrow">Inventario y equipamiento</p><h2>${escapeHtml(c.name)}</h2></div><span class="inventory26-badge">Forja 2.7</span></div><div class="inventory26-summary"><b>Configuración activa: ${c.activeLoadout26==="back"?"Arma de espalda":"Manos"}</b><div class="inventory26-summary-grid"><span><b>Arma</b><br>${escapeHtml(w?.name||"Ninguna")}</span><span><b>Escudo</b><br>${shieldActive26(c)?"Activo":"Inactivo"}</span><span><b>CA</b><br>${c.ac}</span><span><b>FUE / DES</b><br>${c.str} / ${c.dex}</span></div></div><div class="card-actions"><button id="useHands26" class="${c.activeLoadout26==="hands"?"primary":"secondary"}">Usar manos</button><button id="useBack26" class="${c.activeLoadout26==="back"?"primary":"secondary"}">Usar espalda</button></div><h3>Ranuras</h3><div class="inventory26-grid">${EQUIP_SLOTS_26.map(([s,l])=>{const i=equipped26(c,s);return`<div class="inventory26-slot"><b>${l}</b><small>${escapeHtml(i?.name||"Vacío")}</small>${i?`<small>${escapeHtml(effect26(i))}</small><button class="danger" data-clear26="${s}">Quitar</button>`:""}</div>`}).join("")}</div><h3>Inventario</h3>${c.inventory26.map(i=>`<div class="inventory26-item"><span><b>${escapeHtml(i.name)}${i.quantity>1?" ×"+i.quantity:""}</b><small>${escapeHtml(effect26(i))}</small><small>${i.equippedSlot?"Equipado":"Guardado"}</small></span><span class="inventory26-actions">${EQUIP_SLOTS_26.some(([s])=>compatible26(i,s))?`<button class="ghost" data-equip26="${i.id}">Equipar</button>`:""}${i.equippedSlot?`<button class="danger" data-unequip26="${i.id}">Quitar</button>`:""}</span></div>`).join("")}<h3>Añadir botín</h3><div class="form-grid"><label>Objeto<select id="lootName26">${Object.values(ITEM_DB_26).map(i=>`<option>${escapeHtml(i.name)}</option>`).join("")}</select></label><label>Cantidad<input id="lootQty26" type="number" min="1" value="1"></label></div><button id="addLoot26" class="primary wide">Añadir al inventario</button><button id="inventory26BackBottom" class="ghost wide">← Volver a la ficha</button></article>`;
 $("#useHands26").onclick=()=>{c.activeLoadout26="hands";applyEquipment26(c);save();renderInventory26(c)};$("#useBack26").onclick=()=>{const b=equipped26(c,"back");if(!b||b.type!=="weapon")return alert("Equipa primero un arma en Espalda.");c.activeLoadout26="back";applyEquipment26(c);save();renderInventory26(c)};$$('[data-equip26]').forEach(b=>b.onclick=()=>{const i=item26(c,b.dataset.equip26),opts=EQUIP_SLOTS_26.filter(([s])=>compatible26(i,s));const n=Number(prompt("Elige ranura:\n"+opts.map((x,j)=>(j+1)+". "+x[1]).join("\n"),"1"));if(opts[n-1]){equip26(c,i,opts[n-1][0]);renderInventory26(c)}});$$('[data-unequip26]').forEach(b=>b.onclick=()=>{unequip26(c,item26(c,b.dataset.unequip26));applyEquipment26(c);save();renderInventory26(c)});$$('[data-clear26]').forEach(b=>b.onclick=()=>{unequip26(c,equipped26(c,b.dataset.clear26));applyEquipment26(c);save();renderInventory26(c)});$("#addLoot26").onclick=()=>{addItem26(c,$("#lootName26").value,Math.max(1,Number($("#lootQty26").value||1)));renderInventory26(c)};const back=()=>openSheet(c.id);$("#inventory26BackBottom").onclick=back;$("#inventory26BackTop").onclick=back}
 characters.forEach(c=>{ensureInventory26(c);applyEquipment26(c)});
 const OLD_WEAPON_CHOICES_26=weaponChoices22;
 weaponChoices22=function(c,mode){ensureInventory26(c);applyEquipment26(c);const items=[equipped26(c,"rightHand"),equipped26(c,"leftHand"),equipped26(c,"back")].filter(Boolean),out=[];items.forEach(i=>{if(i.type!=="weapon")return;if(mode==="melee"&&i.melee)out.push({...i,display:i.name,mode:i.equippedSlot==="back"?"back":"hands"});if(mode==="ranged"&&(i.ranged||i.thrown))out.push({...i,display:i.thrown?"Lanzar "+i.name:i.name,mode:i.equippedSlot==="back"?"back":"hands"})});return out.length?out:OLD_WEAPON_CHOICES_26(c,mode)};
+
+
+/* =========================================================
+   FORJA 2.7 · INVENTARIO NATIVO EN CREACIÓN Y FICHA
+   ========================================================= */
+
+function emptyEquipment27(){
+  const value={};
+  EQUIP_SLOTS_26.forEach(([slot])=>value[slot]=null);
+  return value;
+}
+
+function wizardInventorySignature27(){
+  const pack=WIZARD_EQUIPMENT_PACKAGES[wizardState.className]?.[wizardState.equipmentPackage]?.items||"";
+  return [wizardState.className,wizardState.equipmentPackage,pack,wizardState.armor,wizardState.shield,wizardState.weapon].join("|");
+}
+
+function addUniqueWizardItem27(list,name,quantity=1){
+  if(!name)return;
+  const base=ITEM_DB_26[normalizeSimple(name)];
+  if(!base)return;
+  const stack=list.find(i=>i.stackable&&normalizeSimple(i.name)===normalizeSimple(name));
+  if(stack){stack.quantity+=quantity;return}
+  list.push(cloneItem26(name,quantity));
+}
+
+function ensureWizardInventory27(force=false){
+  const signature=wizardInventorySignature27();
+  if(!force&&wizardState.inventorySignature27===signature&&wizardState.inventory27?.length)return;
+
+  const items=[];
+  const pack=WIZARD_EQUIPMENT_PACKAGES[wizardState.className]?.[wizardState.equipmentPackage]?.items||"";
+  parseInitialEquipment26(pack).forEach(entry=>{
+    if(Array.isArray(entry))addUniqueWizardItem27(items,entry[0],entry[1]);
+    else addUniqueWizardItem27(items,entry,1);
+  });
+  addUniqueWizardItem27(items,wizardState.armor,1);
+  if(wizardState.shield)addUniqueWizardItem27(items,"Escudo",1);
+  addUniqueWizardItem27(items,wizardState.weapon,1);
+
+  wizardState.inventory27=items;
+  wizardState.equipment27=emptyEquipment27();
+  wizardState.inventorySignature27=signature;
+  wizardState.activeLoadout27="hands";
+}
+
+function wizardItem27(id){
+  return wizardState.inventory27.find(item=>item.id===id)||null;
+}
+
+function wizardEquipped27(slot){
+  return wizardItem27(wizardState.equipment27?.[slot]);
+}
+
+function wizardUnequip27(item){
+  if(!item)return;
+  Object.keys(wizardState.equipment27).forEach(slot=>{
+    if(wizardState.equipment27[slot]===item.id)wizardState.equipment27[slot]=null;
+  });
+  item.equippedSlot=null;
+}
+
+function wizardEquip27(item,slot){
+  if(!compatible26(item,slot))return;
+  const previous=wizardEquipped27(slot);
+  if(previous)wizardUnequip27(previous);
+  wizardUnequip27(item);
+  wizardState.equipment27[slot]=item.id;
+  item.equippedSlot=slot;
+}
+
+function autoEquipWizard27(){
+  wizardState.equipment27=emptyEquipment27();
+  wizardState.inventory27.forEach(item=>item.equippedSlot=null);
+
+  const armor=wizardState.inventory27.find(i=>i.type==="armor");
+  const shield=wizardState.inventory27.find(i=>i.type==="shield");
+  const primary=wizardState.inventory27.find(i=>i.type==="weapon"&&normalizeSimple(i.name)===normalizeSimple(wizardState.weapon))
+    ||wizardState.inventory27.find(i=>i.type==="weapon");
+  const ranged=wizardState.inventory27.find(i=>i.type==="weapon"&&i.ranged&&!i.thrown&&i.id!==primary?.id);
+  const twoHanded=wizardState.inventory27.find(i=>i.type==="weapon"&&i.hands===2&&i.id!==primary?.id);
+
+  if(armor)wizardEquip27(armor,"body");
+  if(primary){
+    if(primary.hands===2)wizardEquip27(primary,"back");
+    else wizardEquip27(primary,"rightHand");
+  }
+  if(shield&&primary?.hands!==2)wizardEquip27(shield,"leftHand");
+  if(ranged)wizardEquip27(ranged,"back");
+  else if(twoHanded)wizardEquip27(twoHanded,"back");
+}
+
+function wizardEquipmentPreview27(){
+  const temp={
+    level:wizardState.level,
+    str:wizardState.abilities.FUE,dex:wizardState.abilities.DES,
+    con:wizardState.abilities.CON,int:wizardState.abilities.INT,
+    wis:wizardState.abilities.SAB,cha:wizardState.abilities.CAR,
+    inventory26:wizardState.inventory27,
+    equipment26:wizardState.equipment27,
+    inventory26Initialized:true,
+    activeLoadout26:wizardState.activeLoadout27,
+    baseAbilities26:{
+      str:wizardState.abilities.FUE,dex:wizardState.abilities.DES,
+      con:wizardState.abilities.CON,int:wizardState.abilities.INT,
+      wis:wizardState.abilities.SAB,cha:wizardState.abilities.CAR
+    }
+  };
+  applyEquipment26(temp);
+  return temp;
+}
+
+function renderWizardInventory27(){
+  ensureWizardInventory27();
+  const root=document.querySelector("#wizardInventory27");
+  if(!root)return;
+  const preview=wizardEquipmentPreview27();
+
+  root.innerHTML=`
+    <div class="inline-summary27">
+      <b>Resultado actual</b>
+      <div class="inline-summary27-grid">
+        <span><b>CA</b><br>${preview.ac}</span>
+        <span><b>FUE</b><br>${preview.str}</span>
+        <span><b>DES</b><br>${preview.dex}</span>
+        <span><b>Configuración</b><br>${wizardState.activeLoadout27==="back"?"Espalda":"Manos"}</span>
+      </div>
+      <div class="card-actions">
+        <button id="wizardAutoEquip27" class="secondary">Equipar automáticamente</button>
+        <button id="wizardHands27" class="${wizardState.activeLoadout27==="hands"?"primary":"secondary"}">Usar manos</button>
+        <button id="wizardBack27" class="${wizardState.activeLoadout27==="back"?"primary":"secondary"}">Usar espalda</button>
+      </div>
+    </div>
+
+    <h3>Ranuras</h3>
+    <div class="inline-slots27">
+      ${EQUIP_SLOTS_26.map(([slot,label])=>{
+        const options=wizardState.inventory27.filter(item=>compatible26(item,slot));
+        const selected=wizardState.equipment27[slot]||"";
+        return `<div class="inline-slot27">
+          <label>${label}
+            <select data-wizard-slot27="${slot}">
+              <option value="">Vacío</option>
+              ${options.map(item=>`<option value="${item.id}" ${selected===item.id?"selected":""}>${escapeHtml(item.name)}</option>`).join("")}
+            </select>
+          </label>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <h3>Inventario inicial</h3>
+    ${wizardState.inventory27.map(item=>`
+      <div class="inline-item27">
+        <span>
+          <b>${escapeHtml(item.name)}${item.quantity>1?` ×${item.quantity}`:""}</b>
+          <small>${escapeHtml(effect26(item))}</small>
+          <small>${item.equippedSlot?"Equipado":"Guardado"}</small>
+        </span>
+      </div>`).join("")||"<p>No se han detectado objetos iniciales.</p>"}
+
+    <h3>Añadir objeto antes de crear</h3>
+    <div class="form-grid">
+      <label>Objeto
+        <select id="wizardAddItemName27">
+          ${Object.values(ITEM_DB_26).map(item=>`<option value="${escapeHtml(item.name)}">${escapeHtml(item.name)}</option>`).join("")}
+        </select>
+      </label>
+      <label>Cantidad
+        <input id="wizardAddItemQty27" type="number" min="1" value="1">
+      </label>
+    </div>
+    <button id="wizardAddItem27" class="secondary wide">Añadir al inventario</button>`;
+
+  document.querySelector("#wizardAutoEquip27")?.addEventListener("click",()=>{
+    autoEquipWizard27();
+    renderWizardInventory27();
+  });
+  document.querySelector("#wizardHands27")?.addEventListener("click",()=>{
+    wizardState.activeLoadout27="hands";
+    renderWizardInventory27();
+  });
+  document.querySelector("#wizardBack27")?.addEventListener("click",()=>{
+    if(!wizardEquipped27("back")){
+      alert("Equipa primero un arma en Espalda.");
+      return;
+    }
+    wizardState.activeLoadout27="back";
+    renderWizardInventory27();
+  });
+
+  document.querySelectorAll("[data-wizard-slot27]").forEach(select=>{
+    select.addEventListener("change",()=>{
+      const slot=select.dataset.wizardSlot27;
+      const current=wizardEquipped27(slot);
+      if(current)wizardUnequip27(current);
+      if(select.value){
+        const item=wizardItem27(select.value);
+        wizardEquip27(item,slot);
+      }
+      renderWizardInventory27();
+    });
+  });
+
+  document.querySelector("#wizardAddItem27")?.addEventListener("click",()=>{
+    const name=document.querySelector("#wizardAddItemName27")?.value;
+    const qty=Math.max(1,Number(document.querySelector("#wizardAddItemQty27")?.value||1));
+    addUniqueWizardItem27(wizardState.inventory27,name,qty);
+    renderWizardInventory27();
+  });
+}
+
+/* Inventario editable directamente dentro de la hoja. */
+function renderInlineInventory27(character){
+  ensureInventory26(character);
+  applyEquipment26(character);
+  const root=document.querySelector("#inlineInventory27");
+  if(!root)return;
+  const weapon=activeWeapon26(character);
+
+  root.innerHTML=`
+    <div class="inline-inventory27">
+      <div class="inline-summary27">
+        <b>Configuración activa: ${character.activeLoadout26==="back"?"Arma de espalda":"Manos"}</b>
+        <div class="inline-summary27-grid">
+          <span><b>CA</b><br>${character.ac}</span>
+          <span><b>Arma</b><br>${escapeHtml(weapon?.name||"Ninguna")}</span>
+          <span><b>Escudo</b><br>${shieldActive26(character)?"Activo":"Inactivo"}</span>
+          <span><b>FUE / DES</b><br>${character.str} / ${character.dex}</span>
+        </div>
+        <div class="card-actions">
+          <button id="inlineHands27" class="${character.activeLoadout26==="hands"?"primary":"secondary"}">Usar manos</button>
+          <button id="inlineBack27" class="${character.activeLoadout26==="back"?"primary":"secondary"}">Usar espalda</button>
+        </div>
+      </div>
+
+      <h3>Ranuras equipadas</h3>
+      <div class="inline-slots27">
+        ${EQUIP_SLOTS_26.map(([slot,label])=>{
+          const options=character.inventory26.filter(item=>compatible26(item,slot));
+          const selected=character.equipment26[slot]||"";
+          return `<div class="inline-slot27">
+            <label>${label}
+              <select data-inline-slot27="${slot}">
+                <option value="">Vacío</option>
+                ${options.map(item=>`<option value="${item.id}" ${selected===item.id?"selected":""}>${escapeHtml(item.name)}</option>`).join("")}
+              </select>
+            </label>
+          </div>`;
+        }).join("")}
+      </div>
+
+      <h3>Objetos poseídos</h3>
+      ${character.inventory26.map(item=>`
+        <div class="inline-item27">
+          <span>
+            <b>${escapeHtml(item.name)}${item.quantity>1?` ×${item.quantity}`:""}</b>
+            <small>${escapeHtml(effect26(item))}</small>
+            <small>${item.equippedSlot?`Equipado en ${escapeHtml(EQUIP_SLOTS_26.find(x=>x[0]===item.equippedSlot)?.[1]||item.equippedSlot)}`:"Guardado"}</small>
+          </span>
+          <button class="danger" data-remove-item27="${item.id}">Eliminar</button>
+        </div>`).join("")||"<p>Inventario vacío.</p>"}
+
+      <h3>Añadir botín</h3>
+      <div class="form-grid">
+        <label>Objeto
+          <select id="inlineAddName27">
+            ${Object.values(ITEM_DB_26).map(item=>`<option value="${escapeHtml(item.name)}">${escapeHtml(item.name)}</option>`).join("")}
+          </select>
+        </label>
+        <label>Cantidad
+          <input id="inlineAddQty27" type="number" min="1" value="1">
+        </label>
+      </div>
+      <button id="inlineAddItem27" class="secondary wide">Añadir al inventario</button>
+    </div>`;
+
+  document.querySelector("#inlineHands27")?.addEventListener("click",()=>{
+    character.activeLoadout26="hands";
+    applyEquipment26(character);save();openSheet(character.id);
+  });
+  document.querySelector("#inlineBack27")?.addEventListener("click",()=>{
+    const back=equipped26(character,"back");
+    if(!back||back.type!=="weapon"){
+      alert("Equipa primero un arma en la ranura Espalda.");
+      return;
+    }
+    character.activeLoadout26="back";
+    applyEquipment26(character);save();openSheet(character.id);
+  });
+
+  document.querySelectorAll("[data-inline-slot27]").forEach(select=>{
+    select.addEventListener("change",()=>{
+      const slot=select.dataset.inlineSlot27;
+      const current=equipped26(character,slot);
+      if(current)unequip26(character,current);
+      if(select.value){
+        const item=item26(character,select.value);
+        equip26(character,item,slot);
+      }
+      applyEquipment26(character);save();openSheet(character.id);
+    });
+  });
+
+  document.querySelectorAll("[data-remove-item27]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      const item=item26(character,button.dataset.removeItem27);
+      if(!item)return;
+      if(item.equippedSlot)unequip26(character,item);
+      character.inventory26=character.inventory26.filter(x=>x.id!==item.id);
+      applyEquipment26(character);save();openSheet(character.id);
+    });
+  });
+
+  document.querySelector("#inlineAddItem27")?.addEventListener("click",()=>{
+    const name=document.querySelector("#inlineAddName27")?.value;
+    const qty=Math.max(1,Number(document.querySelector("#inlineAddQty27")?.value||1));
+    addItem26(character,name,qty);
+    applyEquipment26(character);save();openSheet(character.id);
+  });
+}
+
 </script>
 
 <div id="guidedOverlayV2" class="guided-overlay"><div class="guided-sheet">
